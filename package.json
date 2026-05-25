@@ -1,0 +1,21 @@
+{
+  "name": "entaula-monorepo",
+  "version": "1.0.0",
+  "description": "EnTaula - Motor de tablas y extensión VS Code",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "vscode:prepublish": "npm run compile --workspace=packages/vscode-extension-table"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

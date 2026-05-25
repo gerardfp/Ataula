@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Extension (EnTaula)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension-table"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/packages/vscode-extension-table/dist/**/*.js"
+      ]
+    }
+  ]
+}

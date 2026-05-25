@@ -1,0 +1,95 @@
+{
+  "name": "entaula",
+  "displayName": "EnTaula",
+  "description": "Edición de celdas multilínea, autoajuste y navegación inteligente para tablas ASCII y geométricas.",
+  "version": "1.0.0",
+  "publisher": "gerard",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "edumark",
+        "aliases": ["EduMark", "edumark"],
+        "extensions": [".edu"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "edumark",
+        "scopeName": "source.edu",
+        "path": "./syntaxes/edumark.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "entaula.tableEnter",
+        "title": "EnTaula: Insertar nueva línea en celda de tabla",
+        "category": "EnTaula"
+      },
+      {
+        "command": "entaula.tableTab",
+        "title": "EnTaula: Autoformatear layout de tabla con la tecla º",
+        "category": "EnTaula"
+      },
+      {
+        "command": "entaula.selectCellContent",
+        "title": "EnTaula: Seleccionar contenido completo de celda de tabla",
+        "category": "EnTaula"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "entaula.tableEnter",
+        "key": "enter",
+        "when": "editorTextFocus && (editorLangId == edumark || editorLangId == markdown || editorLangId == plaintext || resourceExtname == .edu || resourceExtname == .md || resourceExtname == .txt)"
+      },
+      {
+        "command": "entaula.tableTab",
+        "key": "oem_5",
+        "when": "editorTextFocus && (editorLangId == edumark || editorLangId == markdown || editorLangId == plaintext || resourceExtname == .edu || resourceExtname == .md || resourceExtname == .txt)"
+      },
+      {
+        "command": "entaula.cursorRightSelect",
+        "key": "shift+right",
+        "when": "editorTextFocus && entaula.isInTableCell"
+      },
+      {
+        "command": "entaula.cursorLeftSelect",
+        "key": "shift+left",
+        "when": "editorTextFocus && entaula.isInTableCell"
+      },
+      {
+        "command": "entaula.cursorDownSelect",
+        "key": "shift+down",
+        "when": "editorTextFocus && entaula.isInTableCell"
+      },
+      {
+        "command": "entaula.cursorUpSelect",
+        "key": "shift+up",
+        "when": "editorTextFocus && entaula.isInTableCell"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "@edumark/shared": "*",
+    "@edumark/table-engine": "*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0"
+  }
+}

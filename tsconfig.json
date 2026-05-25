@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@edumark/shared": ["packages/shared/src/index.ts"],
+      "@edumark/table-engine": ["packages/table-engine/src/index.ts"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/table-engine" },
+    { "path": "packages/vscode-extension-table" }
+  ]
+}
