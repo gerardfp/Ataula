@@ -1,12 +1,14 @@
 # EnTaula ── Text Tables Editor 🚀
 
-<p align="center">
-  <img src="icon.png" width="128" height="128" alt="EnTaula Logo" />
-</p>
+EnTaula is a VS Code extension I built with AI to make editing Markdown tables easier.
+
+You can create tables automatically, resize them, auto-fit them, select text inside a cell, select adjacent cells, and more features I’ll keep adding over time.
 
 ![EnTaula Usage](usage.gif)
 
-**EnTaula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the **EduMark** educational format.
+(From this point on, everything is AI-generated.)
+
+**EnTaula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the [**EduMark**](https://github.com/gerardfp/edumark) educational format.
 
 Forget about breaking your tables when content grows. EnTaula takes care of readjusting geometric borders, managing real multi-line cells, and giving you comfortable shortcuts so you feel like you are in a spreadsheet, but in plain text.
 
@@ -19,9 +21,9 @@ Forget about breaking your tables when content grows. EnTaula takes care of read
 *   🛠️ **Smart Selection & Active Multicursor**:
     *   Select the entire content of a cell across multiple lines using the selection key or mouse.
     *   Automatically generate parallel cursors (multicursor) for each line of the cell when selecting.
-    *   **New!** Automatically deactivate multicursor, returning to a single cursor as soon as you deselect or empty the selection for a smooth, distraction-free editing experience.
-*   ⚙️ **Robust Geometric Parser & Formatter**: Automatically simplifies redundant borders and optimizes the table layout to keep your Markdown or EduMark code clean and readable.
-*   🎨 **Integrated EduMark Syntax**: Native support and syntax highlighting for `.edu` files through the registered `edumark` language.
+    *   **New!** Automatically deactivate multicursor, returning to a single cursor as soon as you deselect or empty the selection for a distraction-free editing experience.
+*   ⚙️ **Robust Geometric Parser & Formatter**: Automatically simplifies redundant borders and optimizes the table layout to keep your Markdown or [EduMark](https://github.com/gerardfp/edumark) code clean and readable.
+*   🎨 **Integrated [EduMark](https://github.com/gerardfp/edumark) Syntax**: Native support and syntax highlighting for `.edu` files through the registered `edumark` language.
 
 ---
 
@@ -61,7 +63,7 @@ graph TD
 ## ⚙️ Supported Extensions
 
 The extension activates automatically on the following formats:
-*   📄 **`.edu`** *(EduMark)*
+*   📄 **`.edu`** *([EduMark](https://github.com/gerardfp/edumark))*
 *   📝 **`.md`** *(Markdown)*
 *   ✏️ **`.txt`** *(Plain Text)*
 

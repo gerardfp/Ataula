@@ -410,3 +410,4 @@
 [2026-05-25T12:35:14.595Z] runLiveFormatting: table formatted. Length: 49
 [2026-05-25T12:35:14.603Z] runLiveFormatting: workspace.applyEdit success: true
 [2026-05-25T12:35:21.260Z] onDidChangeTextDocument: Multiline insert detected inside table! Intercepting...
+[2026-05-25T13:00:19.919Z] Extension activated

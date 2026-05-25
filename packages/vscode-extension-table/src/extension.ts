@@ -529,6 +529,142 @@ export function activate(context: vscode.ExtensionContext) {
       endLineIdx++;
     }
 
+    // Check for table creation or cell addition with |RxC pattern
+    let tableLines: string[] = [];
+    for (let l = startLineIdx; l <= endLineIdx; l++) {
+      tableLines.push(document.lineAt(l).text);
+    }
+
+    let expandedAny = false;
+    let targetIdx = -1;
+    for (let i = 0; i < tableLines.length; i++) {
+      if (/\|\s*\d+\s*x\s*\d+/.test(tableLines[i])) {
+        targetIdx = i;
+        break;
+      }
+    }
+
+    if (targetIdx !== -1) {
+      const lineText = tableLines[targetIdx];
+      const match = lineText.match(/\|\s*(\d+)\s*x\s*(\d+)/);
+      if (match) {
+        const R = parseInt(match[1], 10);
+        const C = parseInt(match[2], 10);
+
+        if (startLineIdx === endLineIdx) {
+          // New table creation
+          const borderRow = '|' + '---|'.repeat(C);
+          const cellRow = '|' + '   |'.repeat(C);
+          const newTableLines: string[] = [];
+          newTableLines.push(borderRow);
+          for (let r = 0; r < R; r++) {
+            newTableLines.push(cellRow);
+            newTableLines.push(borderRow);
+          }
+          tableLines = newTableLines;
+          expandedAny = true;
+        } else {
+          // Existing table edit: expand the pattern on that line
+          const index = match.index!;
+          const length = match[0].length;
+          const hasTrailingPipe = lineText.substring(index + length).trim().startsWith('|');
+
+          const cleanedOfRxC = lineText.replace(/\|\s*\d+\s*x\s*\d+/, '');
+          const isBorderRowWithRxC = cleanedOfRxC.trim() === '' || 
+            (/^[|+\-\s=_]+$/.test(cleanedOfRxC.trim()) && (/[-=_]/.test(cleanedOfRxC.trim()) || cleanedOfRxC.includes('+')));
+
+          let replacement = "";
+          if (isBorderRowWithRxC) {
+            replacement = "|---".repeat(C) + (hasTrailingPipe ? "" : "|");
+          } else {
+            replacement = "|   ".repeat(C) + (hasTrailingPipe ? "" : "|");
+          }
+
+          const resultText = lineText.substring(0, index) + replacement + lineText.substring(index + length);
+          tableLines[targetIdx] = resultText;
+
+          if (!isBorderRowWithRxC && R > 1) {
+            const numPipes = (resultText.match(/\|/g) || []).length;
+            const totalCols = numPipes - 1;
+            if (totalCols > 0) {
+              const extraLines: string[] = [];
+              const borderLine = '|' + '---|'.repeat(totalCols);
+              const cellLine = '|' + '   |'.repeat(totalCols);
+              for (let r = 0; r < R - 1; r++) {
+                extraLines.push(borderLine);
+                extraLines.push(cellLine);
+              }
+              tableLines.splice(targetIdx + 1, 0, ...extraLines);
+            }
+          }
+          expandedAny = true;
+        }
+      }
+    }
+
+    if (expandedAny) {
+      const tableStr = tableLines.join('\n');
+      let tableNode;
+      try {
+        tableNode = parseGeometricTable(tableStr, false, false);
+        tableNode = simplifyTable(tableNode);
+      } catch (e) {
+        return;
+      }
+
+      let formattedTable;
+      try {
+        formattedTable = formatGeometricTable(tableNode);
+      } catch (e: any) {
+        logToFile(`Error formatting expanded RxC table: ${e.message}`);
+        return;
+      }
+
+      let success = false;
+      try {
+        isFormatting = true;
+        isApplyingExtensionEdit = true;
+        const range = new vscode.Range(
+          new vscode.Position(startLineIdx, 0),
+          new vscode.Position(endLineIdx, document.lineAt(endLineIdx).text.length)
+        );
+
+        const workspaceEdit = new vscode.WorkspaceEdit();
+        workspaceEdit.replace(document.uri, range, formattedTable);
+        success = await applyWorkspaceEdit(workspaceEdit);
+      } catch (err: any) {
+        logToFile(`Error applying RxC format edit: ${err.message}`);
+      } finally {
+        isApplyingExtensionEdit = false;
+        isFormatting = false;
+      }
+
+      if (success) {
+        // Place the cursor in the first cell of the newly expanded block/table!
+        const newLines = formattedTable.split('\n');
+        let targetLineIdx = startLineIdx + 1; // Default first cell row for new table
+        
+        if (startLineIdx !== endLineIdx && targetIdx !== -1) {
+          // Inside existing table: row where pattern was entered
+          targetLineIdx = startLineIdx + targetIdx;
+        }
+
+        const targetLineText = newLines[targetLineIdx - startLineIdx] || '';
+        let targetPipeIdx = -1;
+        let pipeCount = 0;
+        for (let k = 0; k < targetLineText.length; k++) {
+          if (targetLineText[k] === '|') {
+            targetPipeIdx = k;
+            break;
+          }
+        }
+        const targetCharIdx = targetPipeIdx !== -1 ? targetPipeIdx + 2 : 2;
+        const newPosition = new vscode.Position(targetLineIdx, targetCharIdx);
+        currentEditor.selection = new vscode.Selection(newPosition, newPosition);
+      }
+      return;
+    }
+
     // Check for middle column addition intent
     const isBorderRow = (rowStr: string): boolean => {
       const trimmed = rowStr.trim();
@@ -1709,7 +1845,9 @@ export function activate(context: vscode.ExtensionContext) {
     // 4. Cursor just before dashes that have '|' after them: e.g. [cursor]-| or [cursor]---|
     const cond4 = /^[-=_]+ *\|/.test(textAfterCursor);
 
-    if (cond1 || cond2 || cond3 || cond4) {
+    const hasRxC = /\|\s*\d+\s*x\s*\d+/.test(currentLineText);
+
+    if (cond1 || cond2 || cond3 || cond4 || hasRxC) {
       await runLayoutFormatting(activeEditor, document);
     } else {
       await vscode.commands.executeCommand('type', { text: 'º' });
