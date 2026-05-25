@@ -44,3 +44,4 @@
 [2026-05-25T11:50:21.592Z] onDidChangeTextDocument: live format debounce timeout firing
 [2026-05-25T11:50:21.593Z] runLiveFormatting: table formatted. Length: 146
 [2026-05-25T11:50:21.599Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T11:51:53.607Z] Extension activated

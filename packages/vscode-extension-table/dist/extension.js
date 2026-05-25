@@ -1657,6 +1657,19 @@ function activate(context) {
             return;
         if (!isTableDoc)
             return;
+        if (event.selections.length > 1 && event.selections.every(sel => sel.isEmpty)) {
+            isConvertingSelection = true;
+            try {
+                editor.selections = [editor.selections[0]];
+            }
+            catch (e) {
+                // ignore
+            }
+            finally {
+                isConvertingSelection = false;
+            }
+            return;
+        }
         if (mouseSelectionTimer) {
             clearTimeout(mouseSelectionTimer);
             mouseSelectionTimer = undefined;
