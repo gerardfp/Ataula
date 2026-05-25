@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { parseGeometricTable, formatGeometricTable, simplifyTable } from '@edumark/table-engine';
+import { TableCell, TableNode } from '@edumark/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 
