@@ -1,6 +1,6 @@
 {
   "name": "entaula-monorepo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "EnTaula - Motor de tablas y extensión VS Code",
   "private": true,
   "workspaces": [

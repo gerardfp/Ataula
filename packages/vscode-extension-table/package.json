@@ -1,8 +1,8 @@
 {
-  "name": "entaula",
+  "name": "entaula-vscode-extension",
   "displayName": "EnTaula",
-  "description": "Edición de celdas multilínea, autoajuste y navegación inteligente para tablas ASCII y geométricas.",
-  "version": "1.0.3",
+  "description": "Multi-line cell editing, auto-resize, and smart selection for text and Markdown tables.",
+  "version": "1.0.4",
   "publisher": "gerardfp",
   "icon": "icon.png",
   "repository": {
