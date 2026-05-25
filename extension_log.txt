@@ -191,3 +191,185 @@
 [2026-05-25T12:16:49.326Z] runLiveFormatting: table formatted. Length: 104
 [2026-05-25T12:16:49.333Z] runLiveFormatting: workspace.applyEdit success: true
 [2026-05-25T12:16:50.542Z] tableEnterCommand: workspace.applyEdit success: true
+[2026-05-25T12:29:01.552Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:01.975Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:05.092Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:05.093Z] runLiveFormatting: table formatted. Length: 20
+[2026-05-25T12:29:05.097Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:05.482Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:05.482Z] runLiveFormatting: table formatted. Length: 26
+[2026-05-25T12:29:05.486Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:07.361Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:08.865Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:08.866Z] runLiveFormatting: table formatted. Length: 38
+[2026-05-25T12:29:08.872Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:09.270Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:09.271Z] runLiveFormatting: table formatted. Length: 41
+[2026-05-25T12:29:09.283Z] runLiveFormatting: workspace.applyEdit success: false
+[2026-05-25T12:29:09.462Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:09.463Z] runLiveFormatting: table formatted. Length: 47
+[2026-05-25T12:29:09.475Z] runLiveFormatting: workspace.applyEdit success: false
+[2026-05-25T12:29:11.461Z] onDidChangeTextDocument: Multiline insert detected inside table! Intercepting...
+[2026-05-25T12:29:12.219Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:12.661Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:27.691Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:28.165Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:29.173Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:29.174Z] runLiveFormatting: table formatted. Length: 20
+[2026-05-25T12:29:29.181Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:29.474Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:29.475Z] runLiveFormatting: table formatted. Length: 26
+[2026-05-25T12:29:29.480Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:30.985Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:32.152Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:32.153Z] runLiveFormatting: table formatted. Length: 38
+[2026-05-25T12:29:32.159Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:32.736Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:32.737Z] runLiveFormatting: table formatted. Length: 41
+[2026-05-25T12:29:32.745Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:33.791Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:33.792Z] runLiveFormatting: table formatted. Length: 47
+[2026-05-25T12:29:33.796Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:34.290Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:34.291Z] runLiveFormatting: table formatted. Length: 50
+[2026-05-25T12:29:34.296Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:35.437Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:35.439Z] runLiveFormatting: table formatted. Length: 71
+[2026-05-25T12:29:35.443Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:36.735Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:36.737Z] runLiveFormatting: table formatted. Length: 68
+[2026-05-25T12:29:36.743Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:37.418Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:37.419Z] runLiveFormatting: table formatted. Length: 50
+[2026-05-25T12:29:37.426Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:37.952Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:37.953Z] runLiveFormatting: table formatted. Length: 47
+[2026-05-25T12:29:37.960Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:29:38.469Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:29:38.470Z] runLiveFormatting: table formatted. Length: 44
+[2026-05-25T12:29:38.477Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:01.606Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:02.059Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:03.921Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:03.922Z] runLiveFormatting: table formatted. Length: 17
+[2026-05-25T12:30:03.926Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:04.109Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:04.110Z] runLiveFormatting: table formatted. Length: 20
+[2026-05-25T12:30:04.114Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:04.280Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:04.281Z] runLiveFormatting: table formatted. Length: 23
+[2026-05-25T12:30:04.285Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:04.453Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:04.454Z] runLiveFormatting: table formatted. Length: 26
+[2026-05-25T12:30:04.458Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:06.148Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:07.703Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:07.704Z] runLiveFormatting: table formatted. Length: 38
+[2026-05-25T12:30:07.706Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:07.874Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:07.875Z] runLiveFormatting: table formatted. Length: 41
+[2026-05-25T12:30:07.878Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:08.077Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:08.078Z] runLiveFormatting: table formatted. Length: 44
+[2026-05-25T12:30:08.085Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:08.284Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:08.285Z] runLiveFormatting: table formatted. Length: 47
+[2026-05-25T12:30:08.290Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:08.442Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:08.443Z] runLiveFormatting: table formatted. Length: 50
+[2026-05-25T12:30:08.450Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:08.679Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:08.680Z] runLiveFormatting: table formatted. Length: 53
+[2026-05-25T12:30:08.685Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:09.653Z] onDidChangeTextDocument: Multiline insert detected inside table! Intercepting...
+[2026-05-25T12:30:10.556Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:10.948Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:12.004Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:12.005Z] runLiveFormatting: table formatted. Length: 89
+[2026-05-25T12:30:12.008Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:12.268Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:12.269Z] runLiveFormatting: table formatted. Length: 89
+[2026-05-25T12:30:12.274Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:12.456Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:12.457Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:12.460Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:13.819Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:13.820Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:13.827Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:14.008Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:14.009Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:14.015Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:14.183Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:14.184Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:14.186Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:14.371Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:14.372Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:14.375Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:14.527Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:14.528Z] runLiveFormatting: table formatted. Length: 94
+[2026-05-25T12:30:14.533Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:17.339Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:17.339Z] runLiveFormatting: table formatted. Length: 49
+[2026-05-25T12:30:17.344Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:18.607Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:18.608Z] runLiveFormatting: table formatted. Length: 59
+[2026-05-25T12:30:18.614Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:18.907Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:18.908Z] runLiveFormatting: table formatted. Length: 74
+[2026-05-25T12:30:18.917Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:19.085Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:19.086Z] runLiveFormatting: table formatted. Length: 79
+[2026-05-25T12:30:19.119Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:19.318Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:19.318Z] runLiveFormatting: table formatted. Length: 89
+[2026-05-25T12:30:19.325Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:21.832Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:23.407Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:23.407Z] runLiveFormatting: table formatted. Length: 118
+[2026-05-25T12:30:23.421Z] runLiveFormatting: workspace.applyEdit success: false
+[2026-05-25T12:30:23.613Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:23.614Z] runLiveFormatting: table formatted. Length: 118
+[2026-05-25T12:30:23.618Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:25.239Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:25.240Z] runLiveFormatting: table formatted. Length: 139
+[2026-05-25T12:30:25.246Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:25.458Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:25.459Z] runLiveFormatting: table formatted. Length: 160
+[2026-05-25T12:30:25.462Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:25.730Z] tableEnterCommand: workspace.applyEdit success: true
+[2026-05-25T12:30:26.159Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:26.160Z] runLiveFormatting: table formatted. Length: 183
+[2026-05-25T12:30:26.165Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:26.362Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:26.363Z] runLiveFormatting: table formatted. Length: 183
+[2026-05-25T12:30:26.367Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:26.460Z] tableEnterCommand: workspace.applyEdit success: true
+[2026-05-25T12:30:26.921Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:26.923Z] runLiveFormatting: table formatted. Length: 206
+[2026-05-25T12:30:26.927Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:27.137Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:27.138Z] runLiveFormatting: table formatted. Length: 206
+[2026-05-25T12:30:27.143Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:27.328Z] tableEnterCommand: workspace.applyEdit success: true
+[2026-05-25T12:30:27.778Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:27.779Z] runLiveFormatting: table formatted. Length: 229
+[2026-05-25T12:30:27.783Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:27.955Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:27.956Z] runLiveFormatting: table formatted. Length: 229
+[2026-05-25T12:30:27.990Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:28.260Z] tableEnterCommand: workspace.applyEdit success: true
+[2026-05-25T12:30:28.671Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:28.672Z] runLiveFormatting: table formatted. Length: 252
+[2026-05-25T12:30:28.678Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:30.577Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:30.578Z] runLiveFormatting: table formatted. Length: 208
+[2026-05-25T12:30:30.583Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:30.935Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:30.935Z] runLiveFormatting: table formatted. Length: 197
+[2026-05-25T12:30:30.942Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:31.169Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:31.170Z] runLiveFormatting: table formatted. Length: 186
+[2026-05-25T12:30:31.175Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:30:31.513Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:30:31.514Z] runLiveFormatting: table formatted. Length: 186
+[2026-05-25T12:30:31.518Z] runLiveFormatting: workspace.applyEdit success: true
