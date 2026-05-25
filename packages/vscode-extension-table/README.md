@@ -1,10 +1,12 @@
 # EnTaula ── Text Tables Editor 🚀
 
-<p align="center">
-  <img src="icon.png" width="128" height="128" alt="EnTaula Logo" />
-</p>
+EnTaula is a VS Code extension I built with AI to make editing text tables easier.
+
+You can create tables automatically, resize them, auto-fit them, edit the content inside the cells, select text inside a cell, select adjacent cells, and more features I’ll keep adding over time.
 
 ![EnTaula Usage](usage.gif)
+
+(From this point on, everything is AI-generated.)
 
 **EnTaula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the [**EduMark**](https://github.com/gerardfp/edumark) educational format.
 

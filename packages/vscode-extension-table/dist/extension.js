@@ -1028,6 +1028,121 @@ function activate(context) {
     while (endLineIdx < document.lineCount - 1 && document.lineAt(endLineIdx + 1).text.trim().startsWith("|")) {
       endLineIdx++;
     }
+    let tableLines = [];
+    for (let l = startLineIdx; l <= endLineIdx; l++) {
+      tableLines.push(document.lineAt(l).text);
+    }
+    let expandedAny = false;
+    let targetIdx = -1;
+    for (let i = 0; i < tableLines.length; i++) {
+      if (/\|\s*\d+\s*x\s*\d+/.test(tableLines[i])) {
+        targetIdx = i;
+        break;
+      }
+    }
+    if (targetIdx !== -1) {
+      const lineText = tableLines[targetIdx];
+      const match = lineText.match(/\|\s*(\d+)\s*x\s*(\d+)/);
+      if (match) {
+        const R = parseInt(match[1], 10);
+        const C = parseInt(match[2], 10);
+        if (startLineIdx === endLineIdx) {
+          const borderRow = "|" + "---|".repeat(C);
+          const cellRow = "|" + "   |".repeat(C);
+          const newTableLines = [];
+          newTableLines.push(borderRow);
+          for (let r = 0; r < R; r++) {
+            newTableLines.push(cellRow);
+            newTableLines.push(borderRow);
+          }
+          tableLines = newTableLines;
+          expandedAny = true;
+        } else {
+          const index = match.index;
+          const length = match[0].length;
+          const hasTrailingPipe = lineText.substring(index + length).trim().startsWith("|");
+          const cleanedOfRxC = lineText.replace(/\|\s*\d+\s*x\s*\d+/, "");
+          const isBorderRowWithRxC = cleanedOfRxC.trim() === "" || /^[|+\-\s=_]+$/.test(cleanedOfRxC.trim()) && (/[-=_]/.test(cleanedOfRxC.trim()) || cleanedOfRxC.includes("+"));
+          let replacement = "";
+          if (isBorderRowWithRxC) {
+            replacement = "|---".repeat(C) + (hasTrailingPipe ? "" : "|");
+          } else {
+            replacement = "|   ".repeat(C) + (hasTrailingPipe ? "" : "|");
+          }
+          const resultText = lineText.substring(0, index) + replacement + lineText.substring(index + length);
+          tableLines[targetIdx] = resultText;
+          if (!isBorderRowWithRxC && R > 1) {
+            const numPipes = (resultText.match(/\|/g) || []).length;
+            const totalCols = numPipes - 1;
+            if (totalCols > 0) {
+              const extraLines = [];
+              const borderLine = "|" + "---|".repeat(totalCols);
+              const cellLine = "|" + "   |".repeat(totalCols);
+              for (let r = 0; r < R - 1; r++) {
+                extraLines.push(borderLine);
+                extraLines.push(cellLine);
+              }
+              tableLines.splice(targetIdx + 1, 0, ...extraLines);
+            }
+          }
+          expandedAny = true;
+        }
+      }
+    }
+    if (expandedAny) {
+      const tableStr2 = tableLines.join("\n");
+      let tableNode2;
+      try {
+        tableNode2 = (0, import_table_engine.parseGeometricTable)(tableStr2, false, false);
+        tableNode2 = (0, import_table_engine.simplifyTable)(tableNode2);
+      } catch (e) {
+        return;
+      }
+      let formattedTable2;
+      try {
+        formattedTable2 = (0, import_table_engine.formatGeometricTable)(tableNode2);
+      } catch (e) {
+        logToFile(`Error formatting expanded RxC table: ${e.message}`);
+        return;
+      }
+      let success2 = false;
+      try {
+        isFormatting = true;
+        isApplyingExtensionEdit = true;
+        const range = new vscode.Range(
+          new vscode.Position(startLineIdx, 0),
+          new vscode.Position(endLineIdx, document.lineAt(endLineIdx).text.length)
+        );
+        const workspaceEdit = new vscode.WorkspaceEdit();
+        workspaceEdit.replace(document.uri, range, formattedTable2);
+        success2 = await applyWorkspaceEdit(workspaceEdit);
+      } catch (err) {
+        logToFile(`Error applying RxC format edit: ${err.message}`);
+      } finally {
+        isApplyingExtensionEdit = false;
+        isFormatting = false;
+      }
+      if (success2) {
+        const newLines = formattedTable2.split("\n");
+        let targetLineIdx = startLineIdx + 1;
+        if (startLineIdx !== endLineIdx && targetIdx !== -1) {
+          targetLineIdx = startLineIdx + targetIdx;
+        }
+        const targetLineText = newLines[targetLineIdx - startLineIdx] || "";
+        let targetPipeIdx = -1;
+        let pipeCount2 = 0;
+        for (let k = 0; k < targetLineText.length; k++) {
+          if (targetLineText[k] === "|") {
+            targetPipeIdx = k;
+            break;
+          }
+        }
+        const targetCharIdx = targetPipeIdx !== -1 ? targetPipeIdx + 2 : 2;
+        const newPosition = new vscode.Position(targetLineIdx, targetCharIdx);
+        currentEditor.selection = new vscode.Selection(newPosition, newPosition);
+      }
+      return;
+    }
     const isBorderRow = (rowStr) => {
       const trimmed = rowStr.trim();
       return /^[|+\-\s=_]+$/.test(trimmed) && (/[-=_]/.test(trimmed) || trimmed.includes("+"));
@@ -1196,7 +1311,7 @@ function activate(context) {
       }
     }
     const isColumnAddition = isLeftColumnAddition || isRightColumnAddition;
-    let tableLines = [];
+    tableLines = [];
     const borderChar = currentLineText.includes("=") ? "=" : currentLineText.includes("_") ? "_" : "-";
     for (let l = startLineIdx; l <= endLineIdx; l++) {
       let originalLine = "";
@@ -1970,10 +2085,187 @@ function activate(context) {
     const cond2 = /\| *$/.test(textBeforeCursor) && /^[-=_]+/.test(textAfterCursor);
     const cond3 = /[-=_]+$/.test(textBeforeCursor) && /^ *\|/.test(textAfterCursor);
     const cond4 = /^[-=_]+ *\|/.test(textAfterCursor);
-    if (cond1 || cond2 || cond3 || cond4) {
+    const hasRxC = /\|\s*\d+\s*x\s*\d+/.test(currentLineText);
+    if (cond1 || cond2 || cond3 || cond4 || hasRxC) {
       await runLayoutFormatting(activeEditor, document);
     } else {
       await vscode.commands.executeCommand("type", { text: "\xBA" });
+    }
+  });
+  const convertToMarkdownCommand = vscode.commands.registerCommand("entaula.convertToMarkdown", async () => {
+    const activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) return;
+    const document = activeEditor.document;
+    const position = activeEditor.selection.active;
+    const currentLineIdx = position.line;
+    const currentLineText = document.lineAt(currentLineIdx).text;
+    if (!currentLineText.trim().startsWith("|")) {
+      vscode.window.showWarningMessage("El cursor no est\xE1 sobre una tabla.");
+      return;
+    }
+    let startLineIdx = currentLineIdx;
+    while (startLineIdx > 0 && document.lineAt(startLineIdx - 1).text.trim().startsWith("|")) {
+      startLineIdx--;
+    }
+    let endLineIdx = currentLineIdx;
+    while (endLineIdx < document.lineCount - 1 && document.lineAt(endLineIdx + 1).text.trim().startsWith("|")) {
+      endLineIdx++;
+    }
+    const lines = [];
+    for (let l = startLineIdx; l <= endLineIdx; l++) {
+      lines.push(document.lineAt(l).text);
+    }
+    const tableStr = lines.join("\n");
+    let tableNode;
+    try {
+      tableNode = (0, import_table_engine.parseGeometricTable)(tableStr, false, false);
+    } catch (e) {
+      vscode.window.showErrorMessage("No se pudo analizar la tabla geom\xE9trica.");
+      return;
+    }
+    if (!tableNode || tableNode.cells.length === 0) {
+      vscode.window.showErrorMessage("La tabla geom\xE9trica est\xE1 vac\xEDa o no es v\xE1lida.");
+      return;
+    }
+    const grid = Array.from(
+      { length: tableNode.rowsCount },
+      () => Array.from({ length: tableNode.colsCount }, () => "")
+    );
+    for (const cell of tableNode.cells) {
+      const cellText = cell.content.map((line) => line.trim()).join("<br>");
+      grid[cell.row][cell.column] = cellText;
+    }
+    const mdLines = [];
+    const headerCols = grid[0] || [];
+    mdLines.push("| " + headerCols.join(" | ") + " |");
+    const separatorRow = "| " + Array(tableNode.colsCount).fill("---").join(" | ") + " |";
+    mdLines.push(separatorRow);
+    for (let r = 1; r < tableNode.rowsCount; r++) {
+      mdLines.push("| " + grid[r].join(" | ") + " |");
+    }
+    const markdownTableText = mdLines.join("\n");
+    try {
+      isFormatting = true;
+      isApplyingExtensionEdit = true;
+      const range = new vscode.Range(
+        new vscode.Position(startLineIdx, 0),
+        new vscode.Position(endLineIdx, document.lineAt(endLineIdx).text.length)
+      );
+      const workspaceEdit = new vscode.WorkspaceEdit();
+      workspaceEdit.replace(document.uri, range, markdownTableText);
+      await applyWorkspaceEdit(workspaceEdit);
+    } catch (err) {
+      vscode.window.showErrorMessage(`Error al convertir a Markdown: ${err.message}`);
+    } finally {
+      isApplyingExtensionEdit = false;
+      isFormatting = false;
+    }
+  });
+  const convertToEnTaulaCommand = vscode.commands.registerCommand("entaula.convertToEnTaula", async () => {
+    const activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) return;
+    const document = activeEditor.document;
+    const position = activeEditor.selection.active;
+    const currentLineIdx = position.line;
+    const currentLineText = document.lineAt(currentLineIdx).text;
+    if (!currentLineText.trim().startsWith("|")) {
+      vscode.window.showWarningMessage("El cursor no est\xE1 sobre una tabla.");
+      return;
+    }
+    let startLineIdx = currentLineIdx;
+    while (startLineIdx > 0 && document.lineAt(startLineIdx - 1).text.trim().startsWith("|")) {
+      startLineIdx--;
+    }
+    let endLineIdx = currentLineIdx;
+    while (endLineIdx < document.lineCount - 1 && document.lineAt(endLineIdx + 1).text.trim().startsWith("|")) {
+      endLineIdx++;
+    }
+    const lines = [];
+    for (let l = startLineIdx; l <= endLineIdx; l++) {
+      lines.push(document.lineAt(l).text.trim());
+    }
+    const headerLines = [];
+    const bodyLines = [];
+    let foundSeparator = false;
+    for (const line of lines) {
+      const isSep = /^[|:\-\s]+$/.test(line) && line.includes("-");
+      if (isSep) {
+        foundSeparator = true;
+        continue;
+      }
+      if (!foundSeparator) {
+        headerLines.push(line);
+      } else {
+        bodyLines.push(line);
+      }
+    }
+    const allRows = [];
+    const parseMarkdownRow = (rowStr) => {
+      const trimmed = rowStr.trim();
+      if (trimmed.startsWith("|")) {
+        const parts = trimmed.substring(1).split("|");
+        if (trimmed.endsWith("|")) {
+          parts.pop();
+        }
+        return parts.map((p) => p.trim());
+      }
+      return rowStr.split("|").map((p) => p.trim());
+    };
+    for (const hl of headerLines) {
+      allRows.push(parseMarkdownRow(hl));
+    }
+    for (const bl of bodyLines) {
+      allRows.push(parseMarkdownRow(bl));
+    }
+    const numRows = allRows.length;
+    if (numRows === 0) {
+      vscode.window.showErrorMessage("La tabla Markdown no tiene filas v\xE1lidas.");
+      return;
+    }
+    const numCols = Math.max(...allRows.map((r) => r.length));
+    const cells = [];
+    for (let r = 0; r < numRows; r++) {
+      for (let c = 0; c < numCols; c++) {
+        const val = allRows[r][c] || "";
+        const cellContent = val.split(/<br\s*\/?>/i).map((line) => line.trim());
+        cells.push({
+          id: `cell_${r}_${c}`,
+          row: r,
+          column: c,
+          colspan: 1,
+          rowspan: 1,
+          content: cellContent
+        });
+      }
+    }
+    const tableNode = {
+      type: "table",
+      rowsCount: numRows,
+      colsCount: numCols,
+      cells
+    };
+    let formattedEnTaulaTable;
+    try {
+      formattedEnTaulaTable = (0, import_table_engine.formatGeometricTable)(tableNode);
+    } catch (e) {
+      vscode.window.showErrorMessage(`No se pudo formatear la tabla EnTaula: ${e.message}`);
+      return;
+    }
+    try {
+      isFormatting = true;
+      isApplyingExtensionEdit = true;
+      const range = new vscode.Range(
+        new vscode.Position(startLineIdx, 0),
+        new vscode.Position(endLineIdx, document.lineAt(endLineIdx).text.length)
+      );
+      const workspaceEdit = new vscode.WorkspaceEdit();
+      workspaceEdit.replace(document.uri, range, formattedEnTaulaTable);
+      await applyWorkspaceEdit(workspaceEdit);
+    } catch (err) {
+      vscode.window.showErrorMessage(`Error al convertir a EnTaula: ${err.message}`);
+    } finally {
+      isApplyingExtensionEdit = false;
+      isFormatting = false;
     }
   });
   const selectCellContentCommand = vscode.commands.registerCommand("entaula.selectCellContent", () => {
@@ -2584,6 +2876,8 @@ function activate(context) {
   context.subscriptions.push(selectCellContentCommand);
   context.subscriptions.push(selectionRangeProvider);
   context.subscriptions.push(autoSelectionDisposable);
+  context.subscriptions.push(convertToMarkdownCommand);
+  context.subscriptions.push(convertToEnTaulaCommand);
 }
 function deactivate() {
 }

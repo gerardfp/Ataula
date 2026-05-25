@@ -58,6 +58,16 @@
         "command": "entaula.selectCellContent",
         "title": "EnTaula: Seleccionar contenido completo de celda de tabla",
         "category": "EnTaula"
+      },
+      {
+        "command": "entaula.convertToMarkdown",
+        "title": "EnTaula: Convertir tabla EnTaula a Markdown",
+        "category": "EnTaula"
+      },
+      {
+        "command": "entaula.convertToEnTaula",
+        "title": "EnTaula: Convertir tabla Markdown a EnTaula",
+        "category": "EnTaula"
       }
     ],
     "keybindings": [

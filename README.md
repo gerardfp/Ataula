@@ -4,6 +4,8 @@ EnTaula is a VS Code extension I built with AI to make editing text tables easie
 
 You can create tables automatically, resize them, auto-fit them, edit the content inside the cells, select text inside a cell, select adjacent cells, and more features I’ll keep adding over time.
 
+Ah! And it allows converting to Markdown and from Markdown (within the limitations of Markdown tables).
+
 ![EnTaula Usage](usage.gif)
 
 (From this point on, everything is AI-generated.)
