@@ -3,7 +3,12 @@
   "displayName": "EnTaula",
   "description": "Edición de celdas multilínea, autoajuste y navegación inteligente para tablas ASCII y geométricas.",
   "version": "1.0.0",
-  "publisher": "gerard",
+  "publisher": "gfalcoperez",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gerardfp/EnTaula"
+  },
+  "license": "GPL-3.0-or-later",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -11,15 +16,22 @@
     "Formatters"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:edumark",
+    "onLanguage:markdown",
+    "onLanguage:plaintext"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "edumark",
-        "aliases": ["EduMark", "edumark"],
-        "extensions": [".edu"],
+        "aliases": [
+          "EduMark",
+          "edumark"
+        ],
+        "extensions": [
+          ".edu"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -82,14 +94,13 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "npx esbuild ./src/extension.ts --bundle --platform=node --target=node18 --external:vscode --outfile=./dist/extension.js",
     "watch": "tsc -watch -p ./"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
     "@edumark/shared": "*",
     "@edumark/table-engine": "*"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.85.0"
   }
 }
