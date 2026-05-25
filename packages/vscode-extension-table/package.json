@@ -3,7 +3,7 @@
   "displayName": "EnTaula",
   "description": "Edición de celdas multilínea, autoajuste y navegación inteligente para tablas ASCII y geométricas.",
   "version": "1.0.2",
-  "publisher": "gfalcoperez",
+  "publisher": "gerardfp",
   "icon": "icon.png",
   "repository": {
     "type": "git",
