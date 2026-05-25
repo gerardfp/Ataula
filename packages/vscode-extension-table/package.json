@@ -4,6 +4,7 @@
   "description": "Edición de celdas multilínea, autoajuste y navegación inteligente para tablas ASCII y geométricas.",
   "version": "1.0.0",
   "publisher": "gfalcoperez",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/gerardfp/EnTaula"

@@ -373,3 +373,40 @@
 [2026-05-25T12:30:31.513Z] onDidChangeTextDocument: live format debounce timeout firing
 [2026-05-25T12:30:31.514Z] runLiveFormatting: table formatted. Length: 186
 [2026-05-25T12:30:31.518Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:33:16.904Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:18.482Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:18.799Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:19.032Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:19.768Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:20.965Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:22.246Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:23.597Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:24.280Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:49.150Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:49.466Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:52.564Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:54.116Z] onDidChangeTextDocument: Multiline insert detected inside table! Intercepting...
+[2026-05-25T12:33:55.227Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:33:55.561Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:34:14.580Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:34:14.583Z] runLiveFormatting: table formatted. Length: 54
+[2026-05-25T12:34:14.610Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:34:17.374Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:34:17.375Z] runLiveFormatting: table formatted. Length: 54
+[2026-05-25T12:34:17.390Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:34:24.471Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:34:24.473Z] runLiveFormatting: table formatted. Length: 59
+[2026-05-25T12:34:24.486Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:34:46.648Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:34:46.649Z] runLiveFormatting: table formatted. Length: 59
+[2026-05-25T12:34:46.656Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:35:12.093Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:35:12.094Z] runLiveFormatting: table formatted. Length: 59
+[2026-05-25T12:35:12.099Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:35:13.422Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:35:13.423Z] runLiveFormatting: table formatted. Length: 54
+[2026-05-25T12:35:13.441Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:35:14.593Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-25T12:35:14.595Z] runLiveFormatting: table formatted. Length: 49
+[2026-05-25T12:35:14.603Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-25T12:35:21.260Z] onDidChangeTextDocument: Multiline insert detected inside table! Intercepting...

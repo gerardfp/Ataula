@@ -1,51 +1,50 @@
-# EnTaula ── ASCII & Geometric Tables Editor 🚀
+# EnTaula ── Text Tables Editor 🚀
+
+<p align="center">
+  <img src="icon.png" width="128" height="128" alt="EnTaula Logo" />
+</p>
 
 ![EnTaula Usage](usage.gif)
 
-[![VS Code Extension](https://img.img.pm/badge/VS_Code-Extension-blue?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/)
-[![TypeScript](https://img.img.pm/badge/TypeScript-5.4-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.img.pm/badge/Vitest-Passed-green?style=for-the-badge&logo=vitest)](https://vitest.dev/)
-[![License](https://img.img.pm/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+**EnTaula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the **EduMark** educational format.
 
-**EnTaula** es un potente motor de edición y formateo de tablas geométricas y ASCII en texto plano, diseñado específicamente para dar soporte de primer nivel a archivos Markdown, documentos de texto plano y el formato educativo **EduMark**. 
-
-Olvídate de romper tus tablas cuando el contenido crece. EnTaula se encarga de reajustar los bordes geométricos, gestionar celdas multilínea reales, y darte atajos cómodos para que sientas que estás en una hoja de cálculo, pero en texto plano.
+Forget about breaking your tables when content grows. EnTaula takes care of readjusting geometric borders, managing real multi-line cells, and giving you comfortable shortcuts so you feel like you are in a spreadsheet, but in plain text.
 
 ---
 
-## ✨ Características Principales
+## ✨ Key Features
 
-*   📏 **Autoajuste Dinámico e Inteligente**: Las columnas de la tabla se expanden o contraen automáticamente en tiempo real mientras escribes o borras caracteres, evitando envolturas de línea accidentales.
-*   📝 **Celdas Multilínea Reales**: Soporte nativo para celdas de tabla que se expanden a lo largo de varias líneas físicas de texto plano, recalculando perfectamente los bordes superiores, inferiores e intermedios.
-*   🛠️ **Selección Inteligente y Multicursor Activo**:
-    *   Selecciona el contenido completo de una celda en múltiples líneas usando la tecla de selección o el mouse.
-    *   Genera cursores paralelos (multicursor) por cada línea de la celda de forma automática al seleccionar.
-    *   **¡Nuevo!** Desactiva automáticamente el multicursor regresando a un cursor simple en cuanto deseleccionas o vacías la selección para una edición fluida y sin estorbos.
-*   ⚙️ **Parser y Formateador Geométrico Sólido**: Simplifica bordes redundantes y optimiza el diseño de la tabla automáticamente para mantener tu código Markdown o EduMark limpio y legible.
-*   🎨 **Sintaxis EduMark Integrada**: Soporte y resaltado nativo para archivos de extensión `.edu` a través del lenguaje registrado `edumark`.
+*   📏 **Smart Dynamic Auto-adjustment**: Table columns automatically expand or contract in real-time as you type or delete characters, preventing accidental line wrapping.
+*   📝 **Real Multi-line Cells**: Native support for table cells that span across multiple physical lines of plain text, perfectly recalculating top, bottom, and intermediate borders.
+*   🛠️ **Smart Selection & Active Multicursor**:
+    *   Select the entire content of a cell across multiple lines using the selection key or mouse.
+    *   Automatically generate parallel cursors (multicursor) for each line of the cell when selecting.
+    *   **New!** Automatically deactivate multicursor, returning to a single cursor as soon as you deselect or empty the selection for a distraction-free editing experience.
+*   ⚙️ **Robust Geometric Parser & Formatter**: Automatically simplifies redundant borders and optimizes the table layout to keep your Markdown or EduMark code clean and readable.
+*   🎨 **Integrated EduMark Syntax**: Native support and syntax highlighting for `.edu` files through the registered `edumark` language.
 
 ---
 
-## ⌨️ Atajos de Teclado del Editor
+## ⌨️ Editor Keyboard Shortcuts
 
-| Tecla / Atajo | Acción en EnTaula |
+| Key / Shortcut | Action in EnTaula |
 | :--- | :--- |
-| <kbd>Enter</kbd> | Inserta una nueva línea física *dentro* de la celda actual, empujando la tabla y creando un espacio de edición de forma impecable sin romper el resto de columnas. |
-| <kbd>º</kbd> *(tecla º)* | **Autoformateo de Layout**: Permite insertar columnas completas de forma inteligente de manera visual (a la izquierda de la celda, a la derecha, o dividiendo celdas intermedias). |
-| <kbd>Shift + Flechas</kbd> | Selección fluida orientada a celdas que expande el multicursor conforme recorres el contenido interno. |
+| <kbd>Enter</kbd> | Inserts a new physical line *inside* the current cell, pushing the table down and creating editing space seamlessly without breaking the surrounding columns. |
+| <kbd>º</kbd> *(º key)* | **Layout Auto-formatting**: Allows you to insert complete columns intelligently and visually (to the left of the cell, to the right, or dividing intermediate cells). |
+| <kbd>Shift + Arrows</kbd> | Fluid cell-oriented selection that expands the multicursor as you navigate through the internal content. |
 
 ---
 
-## 📁 Estructura del Monorepo
+## 📁 Monorepo Structure
 
-El proyecto está organizado en un monorepo modular utilizando **npm workspaces**:
+The project is organized in a modular monorepo using **npm workspaces**:
 
 ```mermaid
 graph TD
     subgraph Packages
-        shared["@edumark/shared<br>(Tipos comunes y AST)"]
-        engine["@edumark/table-engine<br>(Parser y Formateador Geométrico)"]
-        extension["vscode-extension-table<br>(Extensión VS Code)"]
+        shared["@edumark/shared<br>(Common types and AST)"]
+        engine["@edumark/table-engine<br>(Parser and Geometric Formatter)"]
+        extension["vscode-extension-table<br>(VS Code Extension)"]
     end
 
     engine --> shared
@@ -53,47 +52,47 @@ graph TD
     extension --> engine
 ```
 
-*   **[`packages/shared`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/shared)**: Define los tipos comunes de celdas geométricas (`TableCell`) y nodos de árbol sintáctico (`TableNode`).
-*   **[`packages/table-engine`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/table-engine)**: El núcleo lógico que analiza tablas ASCII, gestiona el algoritmo de autoajuste y la simplificación de bordes redundantes.
-*   **[`packages/vscode-extension-table`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/vscode-extension-table)**: Extensión para Visual Studio Code con los comandos de teclado, el formateador del documento y los listeners de cursor en tiempo real.
+*   **[`packages/shared`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/shared)**: Defines common geometric cell (`TableCell`) and syntax tree node (`TableNode`) types.
+*   **[`packages/table-engine`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/table-engine)**: The core logic that parses ASCII tables, manages the auto-adjust algorithm, and simplifies redundant borders.
+*   **[`packages/vscode-extension-table`](file:///c:/Users/gerard/Desktop/edumark/EnTaula/packages/vscode-extension-table)**: Visual Studio Code extension containing keyboard commands, document formatter, and real-time cursor listeners.
 
 ---
 
-## ⚙️ Extensiones Admitidas
+## ⚙️ Supported Extensions
 
-La extensión se activa automáticamente en los siguientes formatos:
+The extension activates automatically on the following formats:
 *   📄 **`.edu`** *(EduMark)*
 *   📝 **`.md`** *(Markdown)*
-*   ✏️ **`.txt`** *(Texto Plano)*
+*   ✏️ **`.txt`** *(Plain Text)*
 
 ---
 
-## 🛠️ Desarrollo y Contribución
+## 🛠️ Development & Contribution
 
-### 1. Instalación de dependencias
-Instala todas las dependencias del monorepo desde el directorio raíz:
+### 1. Install dependencies
+Install all monorepo dependencies from the root directory:
 ```bash
 npm install
 ```
 
-### 2. Compilar el proyecto
-Compila todos los paquetes de TypeScript:
+### 2. Compile the project
+Compile all TypeScript packages:
 ```bash
 npm run build
 ```
 
-### 3. Ejecutar las pruebas
-La lógica del motor de tablas cuenta con una suite extensa de tests unitarios e integrados utilizando **Vitest**:
+### 3. Run the tests
+The table engine logic features an extensive suite of unit and integration tests using **Vitest**:
 ```bash
 npm run test
 ```
 
-### 4. Probar la Extensión en VS Code
-1. Abre el proyecto en VS Code.
-2. Presiona `Ctrl + Shift + D` para ir a la pestaña **Run and Debug** (Ejecutar y depurar).
-3. Selecciona **Launch Extension (EnTaula)** del menú desplegable superior.
-4. Presiona `F5` para levantar la ventana de pruebas con la extensión totalmente activa.
+### 4. Test the Extension in VS Code
+1. Open the project in VS Code.
+2. Press `Ctrl + Shift + D` to go to the **Run and Debug** tab.
+3. Select **Launch Extension (EnTaula)** from the top dropdown menu.
+4. Press `F5` to open a test window with the extension fully active.
 
 ---
 
-Desarrollado con ❤️ para la edición ágil de tablas en texto plano.
+Developed with ❤️ for agile plain text table editing.
