@@ -28,7 +28,7 @@ function isSupportedFile(document: vscode.TextDocument): boolean {
 
 export function activate(context: vscode.ExtensionContext) {
   logToFile('Extension activated');
-  console.log('La extensión EnTaula está activa.');
+  console.log('La extensión Ataula está activa.');
 
   let isFormatting = false;
   let isApplyingExtensionEdit = false;
@@ -1563,7 +1563,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // 3. Table Enter Command
-  const tableEnterCommand = vscode.commands.registerCommand('entaula.tableEnter', async () => {
+  const tableEnterCommand = vscode.commands.registerCommand('ataula.tableEnter', async () => {
     const activeEditor = vscode.window.activeTextEditor;
     const isTableDoc = activeEditor && isSupportedFile(activeEditor.document);
     if (!activeEditor || !isTableDoc) {
@@ -1819,7 +1819,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  const tableTabCommand = vscode.commands.registerCommand('entaula.tableTab', async () => {
+  const tableTabCommand = vscode.commands.registerCommand('ataula.tableTab', async () => {
     const activeEditor = vscode.window.activeTextEditor;
     const isTableDoc = activeEditor && isSupportedFile(activeEditor.document);
     if (!activeEditor || !isTableDoc) {
@@ -1855,7 +1855,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  const convertToMarkdownCommand = vscode.commands.registerCommand('entaula.convertToMarkdown', async () => {
+  const convertToMarkdownCommand = vscode.commands.registerCommand('ataula.convertToMarkdown', async () => {
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) return;
 
@@ -1944,7 +1944,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  const convertToEnTaulaCommand = vscode.commands.registerCommand('entaula.convertToEnTaula', async () => {
+  const convertToAtaulaCommand = vscode.commands.registerCommand('ataula.convertToAtaula', async () => {
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) return;
 
@@ -2042,11 +2042,11 @@ export function activate(context: vscode.ExtensionContext) {
       cells: cells
     };
 
-    let formattedEnTaulaTable;
+    let formattedAtaulaTable;
     try {
-      formattedEnTaulaTable = formatGeometricTable(tableNode);
+      formattedAtaulaTable = formatGeometricTable(tableNode);
     } catch (e: any) {
-      vscode.window.showErrorMessage(`No se pudo formatear la tabla EnTaula: ${e.message}`);
+      vscode.window.showErrorMessage(`No se pudo formatear la tabla Ataula: ${e.message}`);
       return;
     }
 
@@ -2059,17 +2059,17 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       const workspaceEdit = new vscode.WorkspaceEdit();
-      workspaceEdit.replace(document.uri, range, formattedEnTaulaTable);
+      workspaceEdit.replace(document.uri, range, formattedAtaulaTable);
       await applyWorkspaceEdit(workspaceEdit);
     } catch (err: any) {
-      vscode.window.showErrorMessage(`Error al convertir a EnTaula: ${err.message}`);
+      vscode.window.showErrorMessage(`Error al convertir a Ataula: ${err.message}`);
     } finally {
       isApplyingExtensionEdit = false;
       isFormatting = false;
     }
   });
 
-  const selectCellContentCommand = vscode.commands.registerCommand('entaula.selectCellContent', () => {
+  const selectCellContentCommand = vscode.commands.registerCommand('ataula.selectCellContent', () => {
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) return;
 
@@ -2205,9 +2205,9 @@ export function activate(context: vscode.ExtensionContext) {
     if (isTableDoc && event.selections.length > 0) {
       const position = editor.selection.active;
       const info = getCellAtPosition(editor.document, position);
-      vscode.commands.executeCommand('setContext', 'entaula.isInTableCell', !!info);
+      vscode.commands.executeCommand('setContext', 'ataula.isInTableCell', !!info);
     } else {
-      vscode.commands.executeCommand('setContext', 'entaula.isInTableCell', false);
+      vscode.commands.executeCommand('setContext', 'ataula.isInTableCell', false);
     }
 
     if (isConvertingSelection || isApplyingExtensionEdit || isFormatting) return;
@@ -2381,11 +2381,11 @@ export function activate(context: vscode.ExtensionContext) {
     }));
   };
 
-  registerNavCommand('entaula.cursorRight', editor => {
+  registerNavCommand('ataula.cursorRight', editor => {
     vscode.commands.executeCommand('cursorRight');
   });
 
-  registerNavCommand('entaula.cursorLeft', editor => {
+  registerNavCommand('ataula.cursorLeft', editor => {
     vscode.commands.executeCommand('cursorLeft');
   });
 
@@ -2466,7 +2466,7 @@ export function activate(context: vscode.ExtensionContext) {
     return false;
   }
 
-  registerNavCommand('entaula.cursorRightSelect', editor => {
+  registerNavCommand('ataula.cursorRightSelect', editor => {
     const info = getCellAtPosition(editor.document, editor.selection.active);
     if (!info) {
       vscode.commands.executeCommand('cursorRightSelect');
@@ -2545,7 +2545,7 @@ export function activate(context: vscode.ExtensionContext) {
     applyVirtualSelection(editor, info, vAnchor, newActive);
   });
 
-  registerNavCommand('entaula.cursorLeftSelect', editor => {
+  registerNavCommand('ataula.cursorLeftSelect', editor => {
     const info = getCellAtPosition(editor.document, editor.selection.active);
     if (!info) {
       vscode.commands.executeCommand('cursorLeftSelect');
@@ -2624,15 +2624,15 @@ export function activate(context: vscode.ExtensionContext) {
     applyVirtualSelection(editor, info, vAnchor, newActive);
   });
 
-  registerNavCommand('entaula.cursorDown', editor => {
+  registerNavCommand('ataula.cursorDown', editor => {
     vscode.commands.executeCommand('cursorDown');
   });
 
-  registerNavCommand('entaula.cursorUp', editor => {
+  registerNavCommand('ataula.cursorUp', editor => {
     vscode.commands.executeCommand('cursorUp');
   });
 
-  registerNavCommand('entaula.cursorDownSelect', editor => {
+  registerNavCommand('ataula.cursorDownSelect', editor => {
     const info = getCellAtPosition(editor.document, editor.selection.active);
     if (!info) {
       vscode.commands.executeCommand('cursorDownSelect');
@@ -2709,7 +2709,7 @@ export function activate(context: vscode.ExtensionContext) {
     applyVirtualSelection(editor, info, vAnchor, newActive);
   });
 
-  registerNavCommand('entaula.cursorUpSelect', editor => {
+  registerNavCommand('ataula.cursorUpSelect', editor => {
     const info = getCellAtPosition(editor.document, editor.selection.active);
     if (!info) {
       vscode.commands.executeCommand('cursorUpSelect');
@@ -2793,7 +2793,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(selectionRangeProvider);
   context.subscriptions.push(autoSelectionDisposable);
   context.subscriptions.push(convertToMarkdownCommand);
-  context.subscriptions.push(convertToEnTaulaCommand);
+  context.subscriptions.push(convertToAtaulaCommand);
 }
 
 export function deactivate() {}

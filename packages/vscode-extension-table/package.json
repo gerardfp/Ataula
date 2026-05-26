@@ -1,13 +1,13 @@
 {
-  "name": "entaula-vscode-extension",
-  "displayName": "EnTaula",
+  "name": "ataula-vscode-extension",
+  "displayName": "Ataula",
   "description": "Multi-line cell editing, auto-resize, and smart selection for text and Markdown tables.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "gerardfp",
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gerardfp/EnTaula"
+    "url": "https://github.com/gerardfp/Ataula"
   },
   "license": "GPL-3.0-or-later",
   "engines": {
@@ -45,61 +45,61 @@
     ],
     "commands": [
       {
-        "command": "entaula.tableEnter",
-        "title": "EnTaula: Insertar nueva línea en celda de tabla",
-        "category": "EnTaula"
+        "command": "ataula.tableEnter",
+        "title": "Ataula: Insertar nueva línea en celda de tabla",
+        "category": "Ataula"
       },
       {
-        "command": "entaula.tableTab",
-        "title": "EnTaula: Autoformatear layout de tabla con la tecla º",
-        "category": "EnTaula"
+        "command": "ataula.tableTab",
+        "title": "Ataula: Autoformatear layout de tabla con la tecla º",
+        "category": "Ataula"
       },
       {
-        "command": "entaula.selectCellContent",
-        "title": "EnTaula: Seleccionar contenido completo de celda de tabla",
-        "category": "EnTaula"
+        "command": "ataula.selectCellContent",
+        "title": "Ataula: Seleccionar contenido completo de celda de tabla",
+        "category": "Ataula"
       },
       {
-        "command": "entaula.convertToMarkdown",
-        "title": "EnTaula: Convertir tabla EnTaula a Markdown",
-        "category": "EnTaula"
+        "command": "ataula.convertToMarkdown",
+        "title": "Ataula: Convertir tabla Ataula a Markdown",
+        "category": "Ataula"
       },
       {
-        "command": "entaula.convertToEnTaula",
-        "title": "EnTaula: Convertir tabla Markdown a EnTaula",
-        "category": "EnTaula"
+        "command": "ataula.convertToAtaula",
+        "title": "Ataula: Convertir tabla Markdown a Ataula",
+        "category": "Ataula"
       }
     ],
     "keybindings": [
       {
-        "command": "entaula.tableEnter",
+        "command": "ataula.tableEnter",
         "key": "enter",
         "when": "editorTextFocus && (editorLangId == edumark || editorLangId == markdown || editorLangId == plaintext || resourceExtname == .edu || resourceExtname == .md || resourceExtname == .txt)"
       },
       {
-        "command": "entaula.tableTab",
+        "command": "ataula.tableTab",
         "key": "oem_5",
         "when": "editorTextFocus && (editorLangId == edumark || editorLangId == markdown || editorLangId == plaintext || resourceExtname == .edu || resourceExtname == .md || resourceExtname == .txt)"
       },
       {
-        "command": "entaula.cursorRightSelect",
+        "command": "ataula.cursorRightSelect",
         "key": "shift+right",
-        "when": "editorTextFocus && entaula.isInTableCell"
+        "when": "editorTextFocus && ataula.isInTableCell"
       },
       {
-        "command": "entaula.cursorLeftSelect",
+        "command": "ataula.cursorLeftSelect",
         "key": "shift+left",
-        "when": "editorTextFocus && entaula.isInTableCell"
+        "when": "editorTextFocus && ataula.isInTableCell"
       },
       {
-        "command": "entaula.cursorDownSelect",
+        "command": "ataula.cursorDownSelect",
         "key": "shift+down",
-        "when": "editorTextFocus && entaula.isInTableCell"
+        "when": "editorTextFocus && ataula.isInTableCell"
       },
       {
-        "command": "entaula.cursorUpSelect",
+        "command": "ataula.cursorUpSelect",
         "key": "shift+up",
-        "when": "editorTextFocus && entaula.isInTableCell"
+        "when": "editorTextFocus && ataula.isInTableCell"
       }
     ]
   },

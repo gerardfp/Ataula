@@ -59,7 +59,7 @@ function isSupportedFile(document) {
 }
 function activate(context) {
     logToFile('Extension activated');
-    console.log('La extensión EnTaula está activa.');
+    console.log('La extensión Ataula está activa.');
     let isFormatting = false;
     let isApplyingExtensionEdit = false;
     let pendingFormat = false;
@@ -1433,7 +1433,7 @@ function activate(context) {
         }
     });
     // 3. Table Enter Command
-    const tableEnterCommand = vscode.commands.registerCommand('entaula.tableEnter', async () => {
+    const tableEnterCommand = vscode.commands.registerCommand('ataula.tableEnter', async () => {
         const activeEditor = vscode.window.activeTextEditor;
         const isTableDoc = activeEditor && isSupportedFile(activeEditor.document);
         if (!activeEditor || !isTableDoc) {
@@ -1648,7 +1648,7 @@ function activate(context) {
             activeEditor.selection = new vscode.Selection(newPosition, newPosition);
         }
     });
-    const tableTabCommand = vscode.commands.registerCommand('entaula.tableTab', async () => {
+    const tableTabCommand = vscode.commands.registerCommand('ataula.tableTab', async () => {
         const activeEditor = vscode.window.activeTextEditor;
         const isTableDoc = activeEditor && isSupportedFile(activeEditor.document);
         if (!activeEditor || !isTableDoc) {
@@ -1676,7 +1676,7 @@ function activate(context) {
             await vscode.commands.executeCommand('type', { text: 'º' });
         }
     });
-    const convertToMarkdownCommand = vscode.commands.registerCommand('entaula.convertToMarkdown', async () => {
+    const convertToMarkdownCommand = vscode.commands.registerCommand('ataula.convertToMarkdown', async () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor)
             return;
@@ -1747,7 +1747,7 @@ function activate(context) {
             isFormatting = false;
         }
     });
-    const convertToEnTaulaCommand = vscode.commands.registerCommand('entaula.convertToEnTaula', async () => {
+    const convertToAtaulaCommand = vscode.commands.registerCommand('ataula.convertToAtaula', async () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor)
             return;
@@ -1832,12 +1832,12 @@ function activate(context) {
             colsCount: numCols,
             cells: cells
         };
-        let formattedEnTaulaTable;
+        let formattedAtaulaTable;
         try {
-            formattedEnTaulaTable = (0, table_engine_1.formatGeometricTable)(tableNode);
+            formattedAtaulaTable = (0, table_engine_1.formatGeometricTable)(tableNode);
         }
         catch (e) {
-            vscode.window.showErrorMessage(`No se pudo formatear la tabla EnTaula: ${e.message}`);
+            vscode.window.showErrorMessage(`No se pudo formatear la tabla Ataula: ${e.message}`);
             return;
         }
         try {
@@ -1845,18 +1845,18 @@ function activate(context) {
             isApplyingExtensionEdit = true;
             const range = new vscode.Range(new vscode.Position(startLineIdx, 0), new vscode.Position(endLineIdx, document.lineAt(endLineIdx).text.length));
             const workspaceEdit = new vscode.WorkspaceEdit();
-            workspaceEdit.replace(document.uri, range, formattedEnTaulaTable);
+            workspaceEdit.replace(document.uri, range, formattedAtaulaTable);
             await applyWorkspaceEdit(workspaceEdit);
         }
         catch (err) {
-            vscode.window.showErrorMessage(`Error al convertir a EnTaula: ${err.message}`);
+            vscode.window.showErrorMessage(`Error al convertir a Ataula: ${err.message}`);
         }
         finally {
             isApplyingExtensionEdit = false;
             isFormatting = false;
         }
     });
-    const selectCellContentCommand = vscode.commands.registerCommand('entaula.selectCellContent', () => {
+    const selectCellContentCommand = vscode.commands.registerCommand('ataula.selectCellContent', () => {
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor)
             return;
@@ -1953,10 +1953,10 @@ function activate(context) {
         if (isTableDoc && event.selections.length > 0) {
             const position = editor.selection.active;
             const info = getCellAtPosition(editor.document, position);
-            vscode.commands.executeCommand('setContext', 'entaula.isInTableCell', !!info);
+            vscode.commands.executeCommand('setContext', 'ataula.isInTableCell', !!info);
         }
         else {
-            vscode.commands.executeCommand('setContext', 'entaula.isInTableCell', false);
+            vscode.commands.executeCommand('setContext', 'ataula.isInTableCell', false);
         }
         if (isConvertingSelection || isApplyingExtensionEdit || isFormatting)
             return;
@@ -2113,10 +2113,10 @@ function activate(context) {
                 execute(editor);
         }));
     };
-    registerNavCommand('entaula.cursorRight', editor => {
+    registerNavCommand('ataula.cursorRight', editor => {
         vscode.commands.executeCommand('cursorRight');
     });
-    registerNavCommand('entaula.cursorLeft', editor => {
+    registerNavCommand('ataula.cursorLeft', editor => {
         vscode.commands.executeCommand('cursorLeft');
     });
     function findCellAtGrid(cells, row, col) {
@@ -2177,7 +2177,7 @@ function activate(context) {
         }
         return false;
     }
-    registerNavCommand('entaula.cursorRightSelect', editor => {
+    registerNavCommand('ataula.cursorRightSelect', editor => {
         const info = getCellAtPosition(editor.document, editor.selection.active);
         if (!info) {
             vscode.commands.executeCommand('cursorRightSelect');
@@ -2252,7 +2252,7 @@ function activate(context) {
         }
         applyVirtualSelection(editor, info, vAnchor, newActive);
     });
-    registerNavCommand('entaula.cursorLeftSelect', editor => {
+    registerNavCommand('ataula.cursorLeftSelect', editor => {
         const info = getCellAtPosition(editor.document, editor.selection.active);
         if (!info) {
             vscode.commands.executeCommand('cursorLeftSelect');
@@ -2327,13 +2327,13 @@ function activate(context) {
         }
         applyVirtualSelection(editor, info, vAnchor, newActive);
     });
-    registerNavCommand('entaula.cursorDown', editor => {
+    registerNavCommand('ataula.cursorDown', editor => {
         vscode.commands.executeCommand('cursorDown');
     });
-    registerNavCommand('entaula.cursorUp', editor => {
+    registerNavCommand('ataula.cursorUp', editor => {
         vscode.commands.executeCommand('cursorUp');
     });
-    registerNavCommand('entaula.cursorDownSelect', editor => {
+    registerNavCommand('ataula.cursorDownSelect', editor => {
         const info = getCellAtPosition(editor.document, editor.selection.active);
         if (!info) {
             vscode.commands.executeCommand('cursorDownSelect');
@@ -2405,7 +2405,7 @@ function activate(context) {
         }
         applyVirtualSelection(editor, info, vAnchor, newActive);
     });
-    registerNavCommand('entaula.cursorUpSelect', editor => {
+    registerNavCommand('ataula.cursorUpSelect', editor => {
         const info = getCellAtPosition(editor.document, editor.selection.active);
         if (!info) {
             vscode.commands.executeCommand('cursorUpSelect');
@@ -2484,7 +2484,7 @@ function activate(context) {
     context.subscriptions.push(selectionRangeProvider);
     context.subscriptions.push(autoSelectionDisposable);
     context.subscriptions.push(convertToMarkdownCommand);
-    context.subscriptions.push(convertToEnTaulaCommand);
+    context.subscriptions.push(convertToAtaulaCommand);
 }
 function deactivate() { }
 function getLineBoundaryPos(lineText, vLines) {

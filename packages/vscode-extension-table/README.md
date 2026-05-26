@@ -1,16 +1,16 @@
-# EnTaula ── Text Tables Editor 🚀
+# Ataula ── Text Tables Editor 🚀
 
-EnTaula is a VS Code extension I built with AI to make editing text tables easier.
+Ataula is a VS Code extension I built with AI to make editing text tables easier.
 
 You can create tables automatically, resize them, auto-fit them, edit the content inside the cells, select text inside a cell, select adjacent cells, and more features I’ll keep adding over time.
 
-![EnTaula Usage](usage.gif)
+![Ataula Usage](usage.gif)
 
 (From this point on, everything is AI-generated.)
 
-**EnTaula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the [**EduMark**](https://github.com/gerardfp/edumark) educational format.
+**Ataula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the [**EduMark**](https://github.com/gerardfp/edumark) educational format.
 
-Forget about breaking your tables when content grows. EnTaula takes care of readjusting geometric borders, managing real multi-line cells, and giving you comfortable shortcuts so you feel like you are in a spreadsheet, but in plain text.
+Forget about breaking your tables when content grows. Ataula takes care of readjusting geometric borders, managing real multi-line cells, and giving you comfortable shortcuts so you feel like you are in a spreadsheet, but in plain text.
 
 ---
 
@@ -29,7 +29,7 @@ Forget about breaking your tables when content grows. EnTaula takes care of read
 
 ## ⌨️ Editor Keyboard Shortcuts
 
-| Key / Shortcut | Action in EnTaula |
+| Key / Shortcut | Action in Ataula |
 | :--- | :--- |
 | <kbd>Enter</kbd> | Inserts a new physical line *inside* the current cell, pushing the table down and creating editing space seamlessly without breaking the surrounding columns. |
 | <kbd>º</kbd> *(º key)* | **Layout Auto-formatting**: Allows you to insert complete columns intelligently and visually (to the left of the cell, to the right, or dividing intermediate cells). |
@@ -92,7 +92,7 @@ npm run test
 ### 4. Test the Extension in VS Code
 1. Open the project in VS Code.
 2. Press `Ctrl + Shift + D` to go to the **Run and Debug** tab.
-3. Select **Launch Extension (EnTaula)** from the top dropdown menu.
+3. Select **Launch Extension (Ataula)** from the top dropdown menu.
 4. Press `F5` to open a test window with the extension fully active.
 
 ---

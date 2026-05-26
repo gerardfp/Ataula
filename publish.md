@@ -1,6 +1,6 @@
 # Guía de Publicación en el VS Code Marketplace 🚀
 
-Esta guía detalla los pasos para empaquetar y publicar la extensión **EnTaula** bajo tu perfil de editor en el Marketplace de Visual Studio Code.
+Esta guía detalla los pasos para empaquetar y publicar la extensión **Ataula** bajo tu perfil de editor en el Marketplace de Visual Studio Code.
 
 ---
 
@@ -36,7 +36,7 @@ El formato de distribución oficial de las extensiones de VS Code es un archivo 
    ```bash
    npx @vscode/vsce package
    ```
-   *Esto compilará el paquete y creará el archivo de distribución `entaula-1.0.0.vsix` en esa misma carpeta.*
+   *Esto compilará el paquete y creará el archivo de distribución `ataula-vscode-extension-1.0.5.vsix` en esa misma carpeta.*
 
 ---
 
@@ -46,7 +46,7 @@ El formato de distribución oficial de las extensiones de VS Code es un archivo 
 1. Entra en el panel de control de editores: **[Marketplace Publisher Portal](https://marketplace.visualstudio.com/manage)**.
 2. Haz clic sobre tu perfil **`gerardfp`**.
 3. Haz clic en **New Extension** -> **Visual Studio Code**.
-4. Arrastra y suelta el archivo `.vsix` recién generado (`packages/vscode-extension-table/entaula-1.0.2.vsix`).
+4. Arrastra y suelta el archivo `.vsix` recién generado (`packages/vscode-extension-table/ataula-vscode-extension-1.0.5.vsix`).
 5. Tras unos breves minutos de verificación de seguridad, la extensión estará en línea.
 
 ### Opción B: Publicación por Consola (CLI)
