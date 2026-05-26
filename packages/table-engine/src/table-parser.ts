@@ -346,6 +346,9 @@ export function parseGeometricTable(tableStr: string, isRubric = false, preserve
     if (minLeadingSpaces === Infinity) {
       minLeadingSpaces = 0;
     }
+    if (minLeadingSpaces > 1) {
+      minLeadingSpaces = 1;
+    }
 
     const finalContent = processedLines.map(line => {
       if (line.trim() === '') return '';

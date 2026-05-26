@@ -462,7 +462,8 @@ export function activate(context: vscode.ExtensionContext) {
         const leftSep = newVLines[cell.column];
         const rightSep = newVLines[cell.column + cell.colspan];
         const slice = lineText.substring(leftSep + 1, rightSep);
-        formattedCellContent.push(slice.trim());
+        const cellLineText = slice.startsWith(' ') ? slice.substring(1) : slice;
+        formattedCellContent.push(cellLineText.trimEnd());
       }
 
       let accumNonSpace = 0;
@@ -1330,7 +1331,7 @@ export function activate(context: vscode.ExtensionContext) {
       const sliceTrimmedLeading = cellLineSlice.startsWith(' ') ? cellLineSlice.substring(1) : cellLineSlice;
       const actualRelCursor = cellLineSlice.startsWith(' ') ? relCursor - 1 : relCursor;
 
-      const part1 = sliceTrimmedLeading.substring(0, actualRelCursor).trimStart();
+      const part1 = sliceTrimmedLeading.substring(0, actualRelCursor);
       const part2 = sliceTrimmedLeading.substring(actualRelCursor).trimEnd();
       
       const normalizeIndentation = (lines: string[]): string[] => {

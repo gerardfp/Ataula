@@ -1,6 +1,6 @@
 {
   "name": "ataula-monorepo",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Ataula - Motor de tablas y extensión VS Code",
   "private": true,
   "workspaces": [

@@ -159,3 +159,42 @@ AFTER
 |   - subitem         |
 |   - another subitem |
 |---------------------|
+
+BEFORE
+|---|
+|  @ |
+|---|
+
+CONTENT
+[BACKSPACE]
+
+AFTER
+|---|
+| @  |
+|---|
+
+BEFORE
+|---|
+|  @ |
+|---|
+
+CONTENT
+a
+
+AFTER
+|---|
+|  a@ |
+|---|
+
+BEFORE
+|---|
+|   @|
+|---|
+
+CONTENT
+a
+
+AFTER
+|-----|
+|   a@ |
+|-----|

@@ -778,7 +778,7 @@ function loadCellEditingTestCases() {
             const relCursor = cursorCol - colStart;
             const sliceTrimmedLeading = cellLineSlice.startsWith(' ') ? cellLineSlice.substring(1) : cellLineSlice;
             const actualRelCursor = cellLineSlice.startsWith(' ') ? relCursor - 1 : relCursor;
-            const part1 = sliceTrimmedLeading.substring(0, actualRelCursor).trimStart();
+            const part1 = sliceTrimmedLeading.substring(0, actualRelCursor);
             const part2 = sliceTrimmedLeading.substring(actualRelCursor).trimEnd();
             if (contentText === '[INTRO]') {
                 const newContent = [...cell.content];
@@ -795,6 +795,15 @@ function loadCellEditingTestCases() {
                         }
                     }
                 }
+            }
+            else if (contentText === '[BACKSPACE]') {
+                const newContent = [...cell.content];
+                while (newContent.length <= lineIdx) {
+                    newContent.push('');
+                }
+                const backspacedPart1 = part1.substring(0, part1.length - 1);
+                newContent[lineIdx] = backspacedPart1 + part2;
+                cell.content = newContent;
             }
             else {
                 const normalizeIndentation = (lines) => {
