@@ -2,7 +2,7 @@
   "name": "ataula-vscode-extension",
   "displayName": "Ataula",
   "description": "Multi-line cell editing, auto-resize, and smart selection for text and Markdown tables.",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "publisher": "gerardfp",
   "icon": "icon.png",
   "repository": {
