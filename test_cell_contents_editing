@@ -198,3 +198,55 @@ AFTER
 |-----|
 |   a@ |
 |-----|
+
+BEFORE
+|---|
+| @  |
+|---|
+
+CONTENT
+[SPACE]
+
+AFTER
+|---|
+|  @ |
+|---|
+
+BEFORE
+|-------|
+|   ABC |
+|-------|
+
+CONTENT
+[BACKSPACE]
+
+AFTER
+|------|
+|  ABC |
+|------|
+
+BEFORE
+|------|
+|  ABC |
+|------|
+
+CONTENT
+[BACKSPACE]
+
+AFTER
+|-----|
+| ABC |
+|-----|
+
+BEFORE
+|-----|
+| ABC |
+|-----|
+
+CONTENT
+[BACKSPACE]
+
+AFTER
+|-----|
+| ABC |
+|-----|
