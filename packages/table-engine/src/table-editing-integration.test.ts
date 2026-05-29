@@ -837,6 +837,13 @@ describe('Table Cell Content Editing Integration Tests', () => {
         const backspacedPart1 = part1.substring(0, part1.length - 1);
         newContent[lineIdx] = backspacedPart1 + part2;
         cell!.content = newContent;
+      } else if (contentText === '[SPACE]') {
+        const newContent = [...cell!.content];
+        while (newContent.length <= lineIdx) {
+          newContent.push('');
+        }
+        newContent[lineIdx] = part1 + ' ' + part2;
+        cell!.content = newContent;
       } else {
         const normalizeIndentation = (lines: string[]): string[] => {
           return lines.map(line => {
