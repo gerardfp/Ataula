@@ -1,31 +1,20 @@
 import * as vscode from 'vscode';
 import { parseGeometricTable, formatGeometricTable, simplifyTable } from '@edumark/table-engine';
 import { TableCell, TableNode } from '@edumark/shared';
-import * as fs from 'fs';
-
-function logToFile(msg: string) {
-  try {
-    const logPath = 'c:\\Users\\gerard\\Desktop\\edumono\\ataula\\extension_log.txt';
-    fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
-  } catch (e) {
-    // Ignore
-  }
-}
-
-function isSupportedFile(document: vscode.TextDocument): boolean {
-  const fileName = document.fileName.toLowerCase();
-  const langId = document.languageId;
-  return (
-    langId === 'edumark' ||
-    langId === 'markdown' ||
-    langId === 'plaintext' ||
-    fileName.endsWith('.edu') ||
-    fileName.endsWith('.md') ||
-    fileName.endsWith('.txt')
-  );
-}
+import { createLogger, isSupportedFile } from './extension-support';
+import {
+  CellPositionInfo,
+  getCellAtPosition,
+  getCellLineContentBounds,
+  getLineBoundaryPos,
+  getMinLeadingSpacesForCell,
+  getSingleCellForChange,
+  isCellSplittingRow,
+  isPartialBorderRow
+} from './table-geometry';
 
 export function activate(context: vscode.ExtensionContext) {
+  const logToFile = createLogger(context);
   logToFile('Extension activated');
   console.log('La extensión Ataula está activa.');
 
@@ -35,7 +24,6 @@ export function activate(context: vscode.ExtensionContext) {
   let currentFormattedTable: string | undefined = undefined;
   let bufferedChanges: { range: vscode.Range; text: string }[] = [];
   let debounceTimer: NodeJS.Timeout | undefined = undefined;
-  let ignoreNextChangesCount = 0;
   let typeFormatScheduled = false;
 
   let activeTable: {
@@ -58,20 +46,12 @@ export function activate(context: vscode.ExtensionContext) {
   const lastFormattedVersions = new Map<string, number>();
 
   async function applyWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit, document?: vscode.TextDocument): Promise<boolean> {
-    ignoreNextChangesCount++;
-    try {
-      const success = await vscode.workspace.applyEdit(workspaceEdit);
-      if (success && document) {
-        lastFormattedVersions.set(document.uri.fsPath, document.version);
-        logToFile(`applyWorkspaceEdit: Set lastFormattedVersion for ${document.uri.fsPath} to version ${document.version}`);
-      } else if (!success) {
-        ignoreNextChangesCount--;
-      }
-      return success;
-    } catch (e) {
-      ignoreNextChangesCount--;
-      throw e;
+    const success = await vscode.workspace.applyEdit(workspaceEdit);
+    if (success && document) {
+      lastFormattedVersions.set(document.uri.fsPath, document.version);
+      logToFile(`applyWorkspaceEdit: Set lastFormattedVersion for ${document.uri.fsPath} to version ${document.version}`);
     }
+    return success;
   }
 
   async function formatAllTablesInDocument(document: vscode.TextDocument) {
@@ -1346,16 +1326,11 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   // Format tables live when text document changes
-  vscode.workspace.onDidChangeTextDocument(async event => {
+  const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(async event => {
     const docUriStr = event.document.uri.fsPath;
     const lastVer = lastFormattedVersions.get(docUriStr) || 0;
     if (event.document.version <= lastVer) {
       logToFile(`onDidChangeTextDocument: Ignoring own format event. Version ${event.document.version} <= ${lastVer}`);
-      return;
-    }
-
-    if (ignoreNextChangesCount > 0) {
-      ignoreNextChangesCount--;
       return;
     }
 
@@ -1648,7 +1623,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
     }
-    const isMultilineInsert = event.contentChanges.length === 1 && change.text.includes('\n');
+    const isMultilineInsert = event.contentChanges.length === 1 && change.range.isEmpty && change.text.includes('\n');
     let isInsideTable = false;
     if (isMultilineInsert) {
       const startLine = change.range.start.line;
@@ -1666,7 +1641,10 @@ export function activate(context: vscode.ExtensionContext) {
       const currentText = event.document.getText();
       const startOffset = event.document.offsetAt(change.range.start);
       
-      // Reconstruct the previous document text
+      // Reconstruct the previous document text. This path only handles pure
+      // multiline insertion; multiline replacement is handled by activeTable
+      // or normal debounced formatting because VS Code events do not include
+      // the deleted text.
       const previousText = currentText.substring(0, startOffset) + currentText.substring(startOffset + change.text.length);
       const prevLines = previousText.split(/\r?\n/);
       
@@ -1938,7 +1916,7 @@ export function activate(context: vscode.ExtensionContext) {
     }, 100);
   });
 
-  vscode.window.onDidChangeTextEditorSelection(event => {
+  const activeTableSelectionDisposable = vscode.window.onDidChangeTextEditorSelection(event => {
     // Skip selection changes triggered by our own formatting edits
     if (isApplyingExtensionEdit) return;
 
@@ -2415,7 +2393,7 @@ export function activate(context: vscode.ExtensionContext) {
       isApplyingExtensionEdit = true;
       const workspaceEdit = new vscode.WorkspaceEdit();
       workspaceEdit.replace(document.uri, range, formattedTable);
-      success = await applyWorkspaceEdit(workspaceEdit);
+      success = await applyWorkspaceEdit(workspaceEdit, document);
       logToFile(`tableEnterCommand: workspace.applyEdit success: ${success}`);
     } catch (err: any) {
       logToFile(`Error applying tableEnter edit: ${err.message}`);
@@ -2539,13 +2517,17 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
 
+    const escapeMarkdownCell = (value: string): string => {
+      return value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    };
+
     // Create a 2D grid representing table cell contents
     const grid: string[][] = Array.from({ length: tableNode.rowsCount }, () =>
       Array.from({ length: tableNode.colsCount }, () => '')
     );
 
     for (const cell of tableNode.cells) {
-      const cellText = cell.content.map(line => line.trim()).join('<br>');
+      const cellText = cell.content.map(line => escapeMarkdownCell(line.trim())).join('<br>');
       grid[cell.row][cell.column] = cellText;
     }
 
@@ -2633,16 +2615,42 @@ export function activate(context: vscode.ExtensionContext) {
 
     const allRows: string[][] = [];
 
+    const splitMarkdownRow = (rowStr: string): string[] => {
+      const cells: string[] = [];
+      let current = '';
+      let escaped = false;
+
+      for (const char of rowStr) {
+        if (escaped) {
+          current += char;
+          escaped = false;
+        } else if (char === '\\') {
+          escaped = true;
+        } else if (char === '|') {
+          cells.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      if (escaped) {
+        current += '\\';
+      }
+      cells.push(current);
+      return cells;
+    };
+
     const parseMarkdownRow = (rowStr: string): string[] => {
       const trimmed = rowStr.trim();
       if (trimmed.startsWith('|')) {
-        const parts = trimmed.substring(1).split('|');
+        const parts = splitMarkdownRow(trimmed.substring(1));
         if (trimmed.endsWith('|')) {
           parts.pop();
         }
         return parts.map(p => p.trim());
       }
-      return rowStr.split('|').map(p => p.trim());
+      return splitMarkdownRow(rowStr).map(p => p.trim());
     };
 
     for (const hl of headerLines) {
@@ -3428,6 +3436,8 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(formattingProvider);
+  context.subscriptions.push(documentChangeDisposable);
+  context.subscriptions.push(activeTableSelectionDisposable);
   context.subscriptions.push(tableEnterCommand);
   context.subscriptions.push(tableTabCommand);
   context.subscriptions.push(selectCellContentCommand);
@@ -3438,370 +3448,3 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
-function getLineBoundaryPos(lineText: string, vLines: number[]): number[] {
-  const lineVLines: number[] = [];
-  for (let colIdx = 0; colIdx < lineText.length; colIdx++) {
-    if (lineText[colIdx] === '|') {
-      lineVLines.push(colIdx);
-    }
-  }
-
-  const boundaryPos = Array(vLines.length).fill(-1);
-  if (lineVLines.length >= 2 && vLines.length >= 2) {
-    boundaryPos[0] = lineVLines[0];
-    boundaryPos[vLines.length - 1] = lineVLines[lineVLines.length - 1];
-    for (let k = 1; k < lineVLines.length - 1; k++) {
-      const s = lineVLines[k];
-      let closestIdx = 1;
-      let minDiff = Math.abs(s - vLines[1]);
-      for (let idx = 2; idx < vLines.length - 1; idx++) {
-        const diff = Math.abs(s - vLines[idx]);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestIdx = idx;
-        }
-      }
-      boundaryPos[closestIdx] = s;
-    }
-  }
-  return boundaryPos;
-}
-
-function isCellSplittingRow(lineText: string): boolean {
-  const trimmed = lineText.trim();
-  if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) return false;
-  const parts = trimmed.split('|');
-  const colContents = parts.slice(1, parts.length - 1);
-  
-  let hasSplitDash = false;
-  let hasNonBorderCell = false;
-  
-  for (const cell of colContents) {
-    const trimmedCell = cell.trim();
-    if (trimmedCell.length > 0) {
-      const isCompleteBorder = /^[-=_]+$/.test(trimmedCell) && !cell.includes(' ');
-      const isSplit = (/^[-=_]+/.test(trimmedCell) || /[-=_]+$/.test(trimmedCell)) && !isCompleteBorder;
-      if (isSplit) {
-        hasSplitDash = true;
-      }
-      if (!isCompleteBorder) {
-        hasNonBorderCell = true;
-      }
-    } else {
-      hasNonBorderCell = true;
-    }
-  }
-  
-  return hasSplitDash && hasNonBorderCell;
-}
-
-function isPartialBorderRow(text: string): boolean {
-  if (isCellSplittingRow(text)) return false;
-  const trimmed = text.trim();
-  if (!trimmed.startsWith('|')) return false;
-  if (!/^[|+\-\s=_]+$/.test(trimmed)) return false;
-  if (!/[-=_]/.test(trimmed)) return false;
-  if (!trimmed.endsWith('|')) return true;
-  
-  // It is a partial border row if it contains an incomplete column (a pipe followed by a space and a dash, or a pipe followed by a dash and spaces)
-  // E.g., "| -", "|- ", "| =", "|= ", "| _", "|_ "
-  if (/\| \s*[-=_]/.test(trimmed) || /\|[-=_]\s+/.test(trimmed) || /\s+[-=_]\s*\|/.test(trimmed)) {
-    return true;
-  }
-  
-  return false;
-}
-
-interface CellPositionInfo {
-  cell: any;
-  startLineIdx: number;
-  endLineIdx: number;
-  hLines: number[];
-  vLines: number[];
-  tableNode: any;
-  r: number;
-  c: number;
-  j: number;
-  i: number;
-}
-
-function getCellAtPosition(document: vscode.TextDocument, position: vscode.Position): CellPositionInfo | undefined {
-  const currentLineIdx = position.line;
-  const currentLineText = document.lineAt(currentLineIdx).text;
-
-  if (!currentLineText.trim().startsWith('|')) return undefined;
-
-  // Find table boundaries
-  let startLineIdx = currentLineIdx;
-  while (startLineIdx > 0 && document.lineAt(startLineIdx - 1).text.trim().startsWith('|')) {
-    startLineIdx--;
-  }
-
-  let endLineIdx = currentLineIdx;
-  while (endLineIdx < document.lineCount - 1 && document.lineAt(endLineIdx + 1).text.trim().startsWith('|')) {
-    endLineIdx++;
-  }
-
-  const tableLines: string[] = [];
-  for (let l = startLineIdx; l <= endLineIdx; l++) {
-    tableLines.push(document.lineAt(l).text);
-  }
-
-  const tableStr = tableLines.join('\n');
-  let tableNode;
-  try {
-    tableNode = parseGeometricTable(tableStr, false, true);
-  } catch (e) {
-    return undefined;
-  }
-
-  if (!tableNode || tableNode.cells.length === 0) return undefined;
-
-  const r = currentLineIdx - startLineIdx;
-  const c = position.character;
-
-  const maxLength = Math.max(...tableLines.map(line => line.length));
-  const grid = tableLines.map(line => line.padEnd(maxLength, ' '));
-
-  const hLines: number[] = [];
-  for (let row = 0; row < grid.length; row++) {
-    const rowStr = grid[row];
-    const isBorderRow = /^[|+\-\s=_]+$/.test(rowStr) && (/[-=_]/.test(rowStr) || rowStr.includes('+'));
-    if (isBorderRow) hLines.push(row);
-  }
-
-  const vLinesSet = new Set<number>();
-  for (const borderRow of hLines) {
-    const rowStr = grid[borderRow];
-    for (let col = 0; col < rowStr.length; col++) {
-      if (rowStr[col] === '|' || rowStr[col] === '+') vLinesSet.add(col);
-    }
-  }
-  const vLines = Array.from(vLinesSet).sort((a, b) => a - b);
-
-  if (hLines.length < 2 || vLines.length < 2) return undefined;
-
-  let j = -1;
-  for (let idx = 0; idx < hLines.length - 1; idx++) {
-    if (r > hLines[idx] && r < hLines[idx + 1]) {
-      j = idx;
-      break;
-    }
-  }
-
-  const currentLineBoundaryPos = getLineBoundaryPos(currentLineText, vLines);
-  let i = -1;
-  for (let idx = 0; idx < vLines.length - 1; idx++) {
-    const left = currentLineBoundaryPos[idx] !== -1 ? currentLineBoundaryPos[idx] : vLines[idx];
-    const right = currentLineBoundaryPos[idx + 1] !== -1 ? currentLineBoundaryPos[idx + 1] : vLines[idx + 1];
-    if (c > left && c <= right) {
-      i = idx;
-      break;
-    }
-  }
-
-  if (j === -1 || i === -1) return undefined;
-
-  const cell = tableNode.cells.find(
-    (cell: any) => cell.row <= j && j < cell.row + cell.rowspan && cell.column <= i && i < cell.column + cell.colspan
-  );
-
-  if (!cell) return undefined;
-
-  return {
-    cell,
-    startLineIdx,
-    endLineIdx,
-    hLines,
-    vLines,
-    tableNode,
-    r,
-    c,
-    j,
-    i
-  };
-}
-
-function getCellLineContentBounds(document: vscode.TextDocument, rIdx: number, cell: any, vLines: number[]): { start: number; end: number } {
-  const lText = document.lineAt(rIdx).text;
-  const bPos = getLineBoundaryPos(lText, vLines);
-  const lSep = bPos[cell.column] !== -1 ? bPos[cell.column] : vLines[cell.column];
-  const rSep = bPos[cell.column + cell.colspan] !== -1 ? bPos[cell.column + cell.colspan] : vLines[cell.column + cell.colspan];
-
-  if (lSep !== -1 && rSep !== -1) {
-    const raw = lText.substring(lSep + 1, rSep);
-    const mStart = raw.match(/^\s*/);
-    const startSpaces = mStart ? mStart[0].length : 0;
-    const mEnd = raw.match(/\s*$/);
-    const endSpaces = mEnd ? mEnd[0].length : 0;
-
-    const contentStart = lSep + 1 + startSpaces;
-    const contentEnd = rSep - endSpaces;
-
-    if (contentStart < contentEnd) {
-      return { start: contentStart, end: contentEnd };
-    } else {
-      return { start: lSep + 2, end: lSep + 2 };
-    }
-  }
-  return { start: vLines[cell.column] + 2, end: vLines[cell.column] + 2 };
-}
-
-function getMinLeadingSpacesForCell(
-  cell: TableCell,
-  startLineIdx: number,
-  hLines: number[],
-  vLines: number[],
-  prevTableLines: string[]
-): number {
-  let minLeadingSpaces = Infinity;
-  const cellStartRow = hLines[cell.row] + 1;
-  const cellEndRow = hLines[cell.row + cell.rowspan] - 1;
-
-  for (let r = cellStartRow; r <= cellEndRow; r++) {
-    if (r < 0 || r >= prevTableLines.length) continue;
-    const lineText = prevTableLines[r];
-    const boundaryPos = getLineBoundaryPos(lineText, vLines);
-    const leftSep = boundaryPos[cell.column] !== -1 ? boundaryPos[cell.column] : vLines[cell.column];
-    const rightSep = boundaryPos[cell.column + cell.colspan] !== -1 ? boundaryPos[cell.column + cell.colspan] : vLines[cell.column + cell.colspan];
-
-    const colStart = leftSep + 1;
-    const slice = lineText.substring(colStart, rightSep);
-    if (slice.trim() !== '') {
-      const match = slice.match(/^( *)/);
-      const leading = match ? match[1].length : 0;
-      if (leading < minLeadingSpaces) {
-        minLeadingSpaces = leading;
-      }
-    }
-  }
-
-  if (minLeadingSpaces === Infinity) {
-    minLeadingSpaces = 0;
-  }
-  if (minLeadingSpaces > 1) {
-    minLeadingSpaces = 1;
-  }
-  return minLeadingSpaces;
-}
-
-function getSingleCellForChange(
-  tableNode: TableNode,
-  changeRange: vscode.Range,
-  startLineIdx: number,
-  hLines: number[],
-  vLines: number[],
-  prevTableLines: string[]
-): { cell: TableCell; startLineIdxInCell: number; endLineIdxInCell: number; startCharIdxInCell: number; endCharIdxInCell: number } | undefined {
-  const startPos = changeRange.start;
-  const endPos = changeRange.end;
-
-  const startR = startPos.line - startLineIdx;
-  const endR = endPos.line - startLineIdx;
-
-  if (startR < 0 || startR >= prevTableLines.length || endR < 0 || endR >= prevTableLines.length) {
-    return undefined;
-  }
-
-  // 1. Check that neither startR nor endR nor any line in between is a border row
-  for (let r = startR; r <= endR; r++) {
-    if (hLines.includes(r)) {
-      return undefined;
-    }
-  }
-
-  // 2. Find row indices j for start and end
-  let startJ = -1;
-  for (let idx = 0; idx < hLines.length - 1; idx++) {
-    if (startR > hLines[idx] && startR < hLines[idx + 1]) {
-      startJ = idx;
-      break;
-    }
-  }
-
-  let endJ = -1;
-  for (let idx = 0; idx < hLines.length - 1; idx++) {
-    if (endR > hLines[idx] && endR < hLines[idx + 1]) {
-      endJ = idx;
-      break;
-    }
-  }
-
-  if (startJ === -1 || endJ === -1) return undefined;
-
-  // 3. Find column indices i for start and end
-  const startLineText = prevTableLines[startR];
-  const startBoundaryPos = getLineBoundaryPos(startLineText, vLines);
-  let startI = -1;
-  for (let idx = 0; idx < vLines.length - 1; idx++) {
-    const left = startBoundaryPos[idx] !== -1 ? startBoundaryPos[idx] : vLines[idx];
-    const right = startBoundaryPos[idx + 1] !== -1 ? startBoundaryPos[idx + 1] : vLines[idx + 1];
-    if (startPos.character > left && startPos.character <= right) {
-      startI = idx;
-      break;
-    }
-  }
-
-  const endLineText = prevTableLines[endR];
-  const endBoundaryPos = getLineBoundaryPos(endLineText, vLines);
-  let endI = -1;
-  for (let idx = 0; idx < vLines.length - 1; idx++) {
-    const left = endBoundaryPos[idx] !== -1 ? endBoundaryPos[idx] : vLines[idx];
-    const right = endBoundaryPos[idx + 1] !== -1 ? endBoundaryPos[idx + 1] : vLines[idx + 1];
-    if (endPos.character > left && endPos.character <= right) {
-      endI = idx;
-      break;
-    }
-  }
-
-  if (startI === -1 || endI === -1) return undefined;
-
-  // 4. Find cell for start position
-  const cell = tableNode.cells.find(
-    (c: any) => c.row <= startJ && startJ < c.row + c.rowspan && c.column <= startI && startI < c.column + c.colspan
-  );
-
-  if (!cell) return undefined;
-
-  // 5. Verify that the end position is also in the same cell
-  const endCell = tableNode.cells.find(
-    (c: any) => c.row <= endJ && endJ < c.row + c.rowspan && c.column <= endI && endI < c.column + c.colspan
-  );
-
-  if (!endCell || endCell.id !== cell.id) return undefined;
-
-  // 6. Verify that the change starts and ends strictly within the cell boundaries (not deleting pipes)
-  const startLeftSep = startBoundaryPos[cell.column] !== -1 ? startBoundaryPos[cell.column] : vLines[cell.column];
-  const startRightSep = startBoundaryPos[cell.column + cell.colspan] !== -1 ? startBoundaryPos[cell.column + cell.colspan] : vLines[cell.column + cell.colspan];
-
-  const endLeftSep = endBoundaryPos[cell.column] !== -1 ? endBoundaryPos[cell.column] : vLines[cell.column];
-  const endRightSep = endBoundaryPos[cell.column + cell.colspan] !== -1 ? endBoundaryPos[cell.column + cell.colspan] : vLines[cell.column + cell.colspan];
-
-  if (startPos.character <= startLeftSep || startPos.character > startRightSep) return undefined;
-  if (endPos.character <= endLeftSep || endPos.character > endRightSep) return undefined;
-
-  // 7. Calculate cell line indices and character offsets using robust minLeadingSpaces helper
-  const cellStartRow = hLines[cell.row] + 1;
-  const startLineIdxInCell = startR - cellStartRow;
-  const endLineIdxInCell = endR - cellStartRow;
-
-  const minLeadingSpaces = getMinLeadingSpacesForCell(cell, startLineIdx, hLines, vLines, prevTableLines);
-
-  const startColStart = startLeftSep + 1;
-  const cellContentAtLine = cell.content[startLineIdxInCell] || '';
-  const startCharIdxInCell = Math.max(0, Math.min(cellContentAtLine.length, startPos.character - (startColStart + minLeadingSpaces)));
-
-  const endColStart = endLeftSep + 1;
-  const cellContentAtEndLine = cell.content[endLineIdxInCell] || '';
-  const endCharIdxInCell = Math.max(0, Math.min(cellContentAtEndLine.length, endPos.character - (endColStart + minLeadingSpaces)));
-
-  return {
-    cell,
-    startLineIdxInCell,
-    endLineIdxInCell,
-    startCharIdxInCell,
-    endCharIdxInCell
-  };
-}
-
-

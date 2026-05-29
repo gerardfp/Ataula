@@ -144,18 +144,29 @@ function formatGeometricTable(table, preserveColWidths = false) {
         }
         cellAllocatedLines.set(cell.id, padded);
     }
-    // Helper to get grid cell at (j, i)
-    const getCellAt = (j, i) => {
-        return cells.find(c => c.row <= j && j < c.row + c.rowspan && c.column <= i && i < c.column + c.colspan);
-    };
+    const cellGrid = Array.from({ length: rowsCount }, () => Array(colsCount).fill(undefined));
+    const cellSpanWidths = new Map();
+    for (const cell of cells) {
+        let cellWidth = 0;
+        for (let c = cell.column; c < cell.column + cell.colspan; c++) {
+            cellWidth += colWidths[c];
+        }
+        cellSpanWidths.set(cell.id, cellWidth + cell.colspan - 1);
+        for (let r = cell.row; r < cell.row + cell.rowspan; r++) {
+            for (let c = cell.column; c < cell.column + cell.colspan; c++) {
+                cellGrid[r][c] = cell;
+            }
+        }
+    }
+    const rowHeightPrefix = Array(rowsCount + 1).fill(0);
+    for (let r = 0; r < rowsCount; r++) {
+        rowHeightPrefix[r + 1] = rowHeightPrefix[r] + rowHeights[r];
+    }
+    const getCellAt = (j, i) => cellGrid[j]?.[i];
     // Helper to slice allocated lines for a cell at a specific row interval and line offset
     const getCellLine = (cell, j, lineOffset) => {
         const allLines = cellAllocatedLines.get(cell.id) || [];
-        // Calculate the start index in allLines for row interval j
-        let startIndex = 0;
-        for (let r = cell.row; r < j; r++) {
-            startIndex += rowHeights[r];
-        }
+        const startIndex = rowHeightPrefix[j] - rowHeightPrefix[cell.row];
         return allLines[startIndex + lineOffset] || '';
     };
     const outputLines = [];
@@ -181,12 +192,7 @@ function formatGeometricTable(table, preserveColWidths = false) {
                 // Only draw if this is the start of the cell (top-left) in this column interval
                 if (cell.column === i) {
                     const rawLine = getCellLine(cell, j, k);
-                    // Calculate cell width spanning multiple columns
-                    let cellWidth = 0;
-                    for (let c = cell.column; c < cell.column + cell.colspan; c++) {
-                        cellWidth += colWidths[c];
-                    }
-                    cellWidth += cell.colspan - 1; // include intermediate borders
+                    const cellWidth = cellSpanWidths.get(cell.id) || colWidths[i];
                     // Format line (left-aligned with padding)
                     const formatted = rawLine.trimEnd().padEnd(cellWidth - 1, ' ');
                     contentLine += ' ' + formatted; // 1 space padding on left
