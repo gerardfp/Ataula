@@ -11435,3 +11435,102 @@
 [2026-05-29T06:30:55.402Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
 [2026-05-29T06:30:56.412Z] onDidChangeTextDocument: Ignoring own format event. Version 528 <= 528
 [2026-05-29T06:30:56.414Z] onDidChangeTextDocument: Ignoring own format event. Version 528 <= 528
+[2026-05-29T06:50:52.674Z] Extension activated
+[2026-05-29T06:50:52.836Z] onDidChangeTextEditorSelection: Pre-initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:50:54.209Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:50:54.243Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 2
+[2026-05-29T06:50:54.244Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:50:54.250Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:50:55.463Z] onDidChangeTextDocument: Ignoring own format event. Version 2 <= 2
+[2026-05-29T06:50:55.465Z] onDidChangeTextDocument: Ignoring own format event. Version 2 <= 2
+[2026-05-29T06:50:57.113Z] onDidChangeTextDocument: Ignoring own format event. Version 2 <= 2
+[2026-05-29T06:50:57.117Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:50:57.283Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:50:57.285Z] runLiveFormatting: table formatted. Length: 20
+[2026-05-29T06:50:57.330Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 4
+[2026-05-29T06:50:57.331Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:50:57.376Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:50:57.384Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 5
+[2026-05-29T06:50:57.385Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:50:57.386Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:50:57.846Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:50:57.855Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 6
+[2026-05-29T06:50:57.856Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:50:57.857Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:50:58.246Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:50:58.255Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 7
+[2026-05-29T06:50:58.255Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:50:58.256Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:05.661Z] onDidChangeTextDocument: Ignoring own format event. Version 7 <= 7
+[2026-05-29T06:51:05.665Z] onDidChangeTextDocument: Ignoring own format event. Version 7 <= 7
+[2026-05-29T06:51:05.698Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:51:05.833Z] onDidChangeTextDocument: Ignoring own format event. Version 7 <= 7
+[2026-05-29T06:51:05.839Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 8
+[2026-05-29T06:51:05.840Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:51:05.841Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:06.755Z] onDidChangeTextDocument: Ignoring own format event. Version 8 <= 8
+[2026-05-29T06:51:06.758Z] onDidChangeTextDocument: Ignoring own format event. Version 8 <= 8
+[2026-05-29T06:51:06.818Z] onDidChangeTextDocument: Ignoring own format event. Version 8 <= 8
+[2026-05-29T06:51:06.821Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:06.924Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:06.924Z] runLiveFormatting: table formatted. Length: 44
+[2026-05-29T06:51:06.930Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 10
+[2026-05-29T06:51:06.931Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:07.414Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:51:07.427Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 11
+[2026-05-29T06:51:07.427Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:51:07.428Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:08.442Z] onDidChangeTextDocument: Ignoring own format event. Version 11 <= 11
+[2026-05-29T06:51:08.444Z] onDidChangeTextDocument: Ignoring own format event. Version 11 <= 11
+[2026-05-29T06:51:08.530Z] onDidChangeTextDocument: Ignoring own format event. Version 11 <= 11
+[2026-05-29T06:51:08.533Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:08.639Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:08.640Z] runLiveFormatting: table formatted. Length: 50
+[2026-05-29T06:51:08.645Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 13
+[2026-05-29T06:51:08.645Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:09.559Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:09.669Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:09.670Z] runLiveFormatting: table formatted. Length: 53
+[2026-05-29T06:51:09.675Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 15
+[2026-05-29T06:51:09.676Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:10.693Z] onDidChangeTextDocument: Ignoring own format event. Version 15 <= 15
+[2026-05-29T06:51:10.696Z] onDidChangeTextDocument: Ignoring own format event. Version 15 <= 15
+[2026-05-29T06:51:11.163Z] onDidChangeTextDocument: Ignoring own format event. Version 15 <= 15
+[2026-05-29T06:51:11.166Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:11.273Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:11.273Z] runLiveFormatting: table formatted. Length: 56
+[2026-05-29T06:51:11.278Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 17
+[2026-05-29T06:51:11.278Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:12.221Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:12.332Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:12.333Z] runLiveFormatting: table formatted. Length: 59
+[2026-05-29T06:51:12.340Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 19
+[2026-05-29T06:51:12.340Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:12.723Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:51:12.738Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 20
+[2026-05-29T06:51:12.739Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:51:12.740Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:13.152Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:51:13.158Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 21
+[2026-05-29T06:51:13.159Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:51:13.160Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:13.485Z] runLiveFormatting: formatting from in-memory activeTable state.
+[2026-05-29T06:51:13.491Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 22
+[2026-05-29T06:51:13.492Z] runLiveFormatting: in-memory workspace.applyEdit success: true
+[2026-05-29T06:51:13.492Z] runLiveFormatting: formatting complete. Setting editor cursor and clearing targetCursor.
+[2026-05-29T06:51:14.513Z] onDidChangeTextDocument: Ignoring own format event. Version 22 <= 22
+[2026-05-29T06:51:14.515Z] onDidChangeTextDocument: Ignoring own format event. Version 22 <= 22
+[2026-05-29T06:51:14.815Z] onDidChangeTextDocument: Ignoring own format event. Version 22 <= 22
+[2026-05-29T06:51:14.819Z] onDidChangeTextDocument: Initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T06:51:14.928Z] onDidChangeTextDocument: live format debounce timeout firing
+[2026-05-29T06:51:14.929Z] runLiveFormatting: table formatted. Length: 71
+[2026-05-29T06:51:14.938Z] applyWorkspaceEdit: Set lastFormattedVersion for c:\Users\gerard\Desktop\provaemk\taula.edu to version 24
+[2026-05-29T06:51:14.938Z] runLiveFormatting: workspace.applyEdit success: true
+[2026-05-29T06:51:15.964Z] onDidChangeTextDocument: Ignoring own format event. Version 24 <= 24
+[2026-05-29T06:51:15.966Z] onDidChangeTextDocument: Ignoring own format event. Version 24 <= 24
+[2026-05-29T07:05:40.793Z] onDidChangeTextEditorSelection: Pre-initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T07:05:40.807Z] onDidChangeTextEditorSelection: Cursor moved outside activeTable boundaries. Invalidating activeTable.
+[2026-05-29T07:05:40.809Z] onDidChangeTextEditorSelection: Pre-initialized activeTable. startLineIdx: 0, endLineIdx: 2
+[2026-05-29T07:05:42.143Z] onDidChangeTextDocument: Ignoring own format event. Version 24 <= 24
+[2026-05-29T07:05:42.150Z] onDidChangeTextDocument: Edit outside activeTable boundaries. Invalidating activeTable.
+[2026-05-29T07:06:37.555Z] Extension activated
