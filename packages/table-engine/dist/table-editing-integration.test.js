@@ -805,6 +805,14 @@ function loadCellEditingTestCases() {
                 newContent[lineIdx] = backspacedPart1 + part2;
                 cell.content = newContent;
             }
+            else if (contentText === '[SPACE]') {
+                const newContent = [...cell.content];
+                while (newContent.length <= lineIdx) {
+                    newContent.push('');
+                }
+                newContent[lineIdx] = part1 + ' ' + part2;
+                cell.content = newContent;
+            }
             else {
                 const normalizeIndentation = (lines) => {
                     return lines.map(line => {
