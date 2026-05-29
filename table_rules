@@ -3,6 +3,8 @@
 
 * Editing cell content auto-resizes it in "real-time"
 
+* Editing cell content never modifies the layout of the table, only modifies its size
+
 * For table layout editing, you must press [º] with 
 the cursor touching a table line dash `-`
 

@@ -214,7 +214,7 @@ AFTER
 
 BEFORE
 |-------|
-|   ABC |
+|   @ABC |
 |-------|
 
 CONTENT
@@ -222,12 +222,12 @@ CONTENT
 
 AFTER
 |------|
-|  ABC |
+|  @ABC |
 |------|
 
 BEFORE
 |------|
-|  ABC |
+|  @ABC |
 |------|
 
 CONTENT
@@ -235,12 +235,12 @@ CONTENT
 
 AFTER
 |-----|
-| ABC |
+| @ABC |
 |-----|
 
 BEFORE
 |-----|
-| ABC |
+| @ABC |
 |-----|
 
 CONTENT
@@ -248,5 +248,5 @@ CONTENT
 
 AFTER
 |-----|
-| ABC |
+| @ABC |
 |-----|
