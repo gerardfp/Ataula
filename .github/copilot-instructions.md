@@ -1,0 +1,11 @@
+# GitHub Copilot & Codex Instructions
+
+> [!IMPORTANT]
+> **CRITICAL CONSTRAINT / RESTRICCIÓN CRÍTICA:**
+> **JAMÁS** modifique los ficheros de datos de test (`test_cell_contents_editing`, `test_selection` y `test_table_autoadjust`) sin permiso explícito del usuario.
+> Ningún modelo o agente de IA debe alterar, sobreescribir ni guardar cambios en esos tres ficheros de pruebas de datos. Si se detecta un fallo de lógica o definición en ellos, el agente debe explicar el error detalladamente al usuario en el chat para que sea corregido a mano o se reciban instrucciones específicas.
+
+## General Guidelines
+- Maintain document alignment and ASCII character counts.
+- Respect active layout rules and do not modify layout tables unless explicitly directed.
+- Always run the Vitest test suite (`npm test`) after any modifications to verify code correctness.
