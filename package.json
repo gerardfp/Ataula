@@ -7,15 +7,23 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "vscode:prepublish": "npm run compile --workspace=packages/vscode-extension-table"
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:props": "vitest run --config vitest.props.config.ts",
+    "test:e2e": "playwright test",
+    "vscode:prepublish": "npm run compile --workspace=packages/vscode-extension-table",
+    "test:integration": "npx ts-node ./packages/vscode-extension-table/src/test/e2e/runIntegrationTests.ts",
+    "build": "tsc -b"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.1",
+    "@vscode/test-electron": "^2.5.2",
+    "fast-check": "^4.8.0",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "mocha": "^10.7.3"
   }
 }

@@ -35,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     tableStr: string;
     documentUri: vscode.Uri;
     documentVersion: number;
+    isDeletion?: boolean;
     targetCursor?: {
       cellId: string;
       lineIdx: number;
@@ -44,6 +45,35 @@ export function activate(context: vscode.ExtensionContext) {
 
 
   const lastFormattedVersions = new Map<string, number>();
+
+  function recalculateActiveTableGeometries(tableStr: string) {
+    if (!activeTable) return;
+    const newRawLines = tableStr.split(/\r?\n/);
+    const newMaxLength = Math.max(...newRawLines.map(line => line.length));
+    const newGrid = newRawLines.map(line => line.padEnd(newMaxLength, ' '));
+    const newHLines: number[] = [];
+    for (let row = 0; row < newGrid.length; row++) {
+      const rowStr = newGrid[row];
+      const isRowBorder = /^[|+\-\s=_]+$/.test(rowStr) && (/[-=_]/.test(rowStr) || rowStr.includes('+'));
+      if (isRowBorder) {
+        newHLines.push(row);
+      }
+    }
+
+    const newVLinesSet = new Set<number>();
+    for (const borderRow of newHLines) {
+      const rowStr = newGrid[borderRow];
+      for (let col = 0; col < rowStr.length; col++) {
+        if (rowStr[col] === '|' || rowStr[col] === '+') {
+          newVLinesSet.add(col);
+        }
+      }
+    }
+    const newVLines = Array.from(newVLinesSet).sort((a, b) => a - b);
+
+    activeTable.hLines = newHLines;
+    activeTable.vLines = newVLines;
+  }
 
   async function applyWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit, document?: vscode.TextDocument): Promise<boolean> {
     const success = await vscode.workspace.applyEdit(workspaceEdit);
@@ -160,56 +190,55 @@ export function activate(context: vscode.ExtensionContext) {
 
       let formattedTable;
       try {
-        formattedTable = formatGeometricTable(activeTable.tableNode);
+        const preserveColWidths = activeTable.isDeletion !== true;
+        formattedTable = formatGeometricTable(activeTable.tableNode, preserveColWidths);
       } catch (e: any) {
         logToFile(`Error formatting table in in-memory runLiveFormatting: ${e.message}`);
         activeTable = undefined;
         return;
       }
 
-      if (formattedTable === activeTable.tableStr) {
-        return;
-      }
+      let success = true;
+      let hadPendingFormat = pendingFormat;
+      if (formattedTable !== activeTable.tableStr) {
+        success = false;
+        try {
+          isFormatting = true;
+          isApplyingExtensionEdit = true;
+          currentFormattedTable = formattedTable;
 
-      let success = false;
-      try {
-        isFormatting = true;
-        isApplyingExtensionEdit = true;
-        currentFormattedTable = formattedTable;
+          const endLineLength = document.lineAt(activeTable.endLineIdx).text.length;
+          const range = new vscode.Range(
+            new vscode.Position(activeTable.startLineIdx, 0),
+            new vscode.Position(activeTable.endLineIdx, endLineLength)
+          );
 
-        const endLineLength = document.lineAt(activeTable.endLineIdx).text.length;
-        const range = new vscode.Range(
-          new vscode.Position(activeTable.startLineIdx, 0),
-          new vscode.Position(activeTable.endLineIdx, endLineLength)
-        );
+          const workspaceEdit = new vscode.WorkspaceEdit();
+          workspaceEdit.replace(document.uri, range, formattedTable);
+          success = await applyWorkspaceEdit(workspaceEdit, document);
+          logToFile(`runLiveFormatting: in-memory workspace.applyEdit success: ${success}`);
+        } catch (err: any) {
+          logToFile(`Error applying live format edit: ${err.message}`);
+        } finally {
+          isApplyingExtensionEdit = false;
+          isFormatting = false;
+          currentFormattedTable = undefined;
 
-        const workspaceEdit = new vscode.WorkspaceEdit();
-        workspaceEdit.replace(document.uri, range, formattedTable);
-        success = await applyWorkspaceEdit(workspaceEdit, document);
-        logToFile(`runLiveFormatting: in-memory workspace.applyEdit success: ${success}`);
-      } catch (err: any) {
-        logToFile(`Error applying live format edit: ${err.message}`);
-      } finally {
-        isApplyingExtensionEdit = false;
-        isFormatting = false;
-        currentFormattedTable = undefined;
-
-        if (pendingFormat) {
-          pendingFormat = false;
-          logToFile(`runLiveFormatting: pendingFormat is true. Scheduling follow-up formatting.`);
-          setTimeout(async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (editor) {
-              await runLiveFormatting(editor, editor.document);
-            }
-          }, 0);
+          if (pendingFormat) {
+            hadPendingFormat = true;
+            pendingFormat = false;
+            logToFile(`runLiveFormatting: pendingFormat is true. Scheduling follow-up formatting.`);
+            setTimeout(async () => {
+              const editor = vscode.window.activeTextEditor;
+              if (editor) {
+                await runLiveFormatting(editor, editor.document);
+              }
+            }, 0);
+          }
         }
       }
 
       if (success) {
-        // Dismiss autocomplete to prevent it from popping up due to formatting edits
-        vscode.commands.executeCommand('hideSuggestWidget');
-
         const newHLines: number[] = [];
         const newRawLines = formattedTable.split('\n');
         const newMaxLength = Math.max(...newRawLines.map(line => line.length));
@@ -233,8 +262,8 @@ export function activate(context: vscode.ExtensionContext) {
         }
         const newVLines = Array.from(newVLinesSet).sort((a, b) => a - b);
 
-        if (pendingFormat) {
-          logToFile(`runLiveFormatting: pendingFormat is true. Skipping editor cursor selection and keeping targetCursor active.`);
+        if (hadPendingFormat) {
+          logToFile(`runLiveFormatting: hadPendingFormat is true. Skipping editor cursor selection and keeping targetCursor active.`);
           activeTable.endLineIdx = activeTable.startLineIdx + (newRawLines.length - 1);
           activeTable.hLines = newHLines;
           activeTable.vLines = newVLines;
@@ -332,7 +361,7 @@ export function activate(context: vscode.ExtensionContext) {
     const tableStr = tableLines.join('\n');
     let tableNode;
     try {
-      tableNode = parseGeometricTable(tableStr, false, true);
+      tableNode = parseGeometricTable(tableStr, false, true, true);
     } catch (e) {
       return;
     }
@@ -510,6 +539,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // 3. Apply the edit
     let success = false;
+    let hadPendingFormat = pendingFormat;
     try {
       isFormatting = true;
       isApplyingExtensionEdit = true;
@@ -550,6 +580,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (pendingFormat) {
+        hadPendingFormat = true;
         logToFile(`runLiveFormatting: pendingFormat is true, scheduling follow-up in 100ms`);
         pendingFormat = false;
         if (debounceTimer) {
@@ -592,76 +623,100 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const newVLines = Array.from(newVLinesSet).sort((a, b) => a - b);
 
-      // Extract content lines of formatted cell
-      const formattedCellContent: string[] = [];
-      const fCellStartRow = newHLines[cell.row] + 1;
-      const fCellEndRow = newHLines[cell.row + cell.rowspan] - 1;
-      for (let rowIdx = fCellStartRow; rowIdx <= fCellEndRow; rowIdx++) {
-        const lineText = newRawLines[rowIdx];
-        const leftSep = newVLines[cell.column];
-        const rightSep = newVLines[cell.column + cell.colspan];
-        const slice = lineText.substring(leftSep + 1, rightSep);
-        const cellLineText = slice.startsWith(' ') ? slice.substring(1) : slice;
-        formattedCellContent.push(cellLineText.trimEnd());
-      }
+      if (hadPendingFormat) {
+        logToFile(`runLiveFormatting: hadPendingFormat is true. Skipping editor cursor selection and bootstrapping activeTable.`);
+        activeTable = {
+          tableNode,
+          startLineIdx,
+          endLineIdx: startLineIdx + (newRawLines.length - 1),
+          hLines: newHLines,
+          vLines: newVLines,
+          tableStr: formattedTable,
+          documentUri: document.uri,
+          documentVersion: document.version
+        };
+      } else {
+        // Extract content lines of formatted cell
+        const formattedCellContent: string[] = [];
+        const fCellStartRow = newHLines[cell.row] + 1;
+        const fCellEndRow = newHLines[cell.row + cell.rowspan] - 1;
+        for (let rowIdx = fCellStartRow; rowIdx <= fCellEndRow; rowIdx++) {
+          const lineText = newRawLines[rowIdx];
+          const leftSep = newVLines[cell.column];
+          const rightSep = newVLines[cell.column + cell.colspan];
+          const slice = lineText.substring(leftSep + 1, rightSep);
+          const cellLineText = slice.startsWith(' ') ? slice.substring(1) : slice;
+          formattedCellContent.push(cellLineText.trimEnd());
+        }
 
-      let accumNonSpace = 0;
-      let targetLine = 0;
-      let targetChar = 0;
+        let accumNonSpace = 0;
+        let targetLine = 0;
+        let targetChar = 0;
 
-      for (let idx = 0; idx < formattedCellContent.length; idx++) {
-        const W_line = formattedCellContent[idx];
-        const lineNonSpace = W_line.replace(/\s/g, '').length;
-        if (accumNonSpace + lineNonSpace >= targetNonSpaceCount) {
-          const rem = targetNonSpaceCount - accumNonSpace;
-          let nonSpaceInLine = 0;
-          let charIdx = 0;
-          while (charIdx < W_line.length && nonSpaceInLine < rem) {
-            if (W_line[charIdx] !== ' ') {
-              nonSpaceInLine++;
+        for (let idx = 0; idx < formattedCellContent.length; idx++) {
+          const W_line = formattedCellContent[idx];
+          const lineNonSpace = W_line.replace(/\s/g, '').length;
+          if (accumNonSpace + lineNonSpace >= targetNonSpaceCount) {
+            const rem = targetNonSpaceCount - accumNonSpace;
+            let nonSpaceInLine = 0;
+            let charIdx = 0;
+            while (charIdx < W_line.length && nonSpaceInLine < rem) {
+              if (W_line[charIdx] !== ' ') {
+                nonSpaceInLine++;
+              }
+              charIdx++;
             }
-            charIdx++;
-          }
-          targetLine = idx;
-          targetChar = charIdx;
-          break;
-        } else {
-          accumNonSpace += lineNonSpace;
-          if (idx === formattedCellContent.length - 1) {
             targetLine = idx;
-            targetChar = W_line.length;
+            targetChar = charIdx;
+            break;
+          } else {
+            accumNonSpace += lineNonSpace;
+            if (idx === formattedCellContent.length - 1) {
+              targetLine = idx;
+              targetChar = W_line.length;
+            }
           }
         }
+
+        // Limit targetChar + trailingSpaceCount to the padded width of the cell
+        let cellWidth = 0;
+        for (let c = cell.column; c < cell.column + cell.colspan; c++) {
+          cellWidth += newVLines[c + 1] - newVLines[c] - 1;
+        }
+        cellWidth += cell.colspan - 1;
+        const maxTargetChar = Math.max(0, cellWidth - 1);
+        const newMinLeadingSpaces = getMinLeadingSpacesForCell(
+          cell,
+          0,
+          newHLines,
+          newVLines,
+          newRawLines
+        );
+        const actualTrailingSpaces = targetChar === 0
+          ? Math.max(0, trailingSpaceCount - newMinLeadingSpaces)
+          : trailingSpaceCount;
+        const finalTargetChar = Math.min(targetChar + actualTrailingSpaces, maxTargetChar);
+
+        const newCursorLine = startLineIdx + fCellStartRow + targetLine;
+        const newCursorChar = newVLines[cell.column] + 2 + finalTargetChar;
+
+        isApplyingExtensionEdit = true;
+        const newPosition = new vscode.Position(newCursorLine, newCursorChar);
+        currentEditor.selection = new vscode.Selection(newPosition, newPosition);
+
+        // Bootstrap activeTable state with the newly formatted table
+        activeTable = {
+          tableNode,
+          startLineIdx,
+          endLineIdx: startLineIdx + (newRawLines.length - 1),
+          hLines: newHLines,
+          vLines: newVLines,
+          tableStr: formattedTable,
+          documentUri: document.uri,
+          documentVersion: document.version
+        };
+        isApplyingExtensionEdit = false;
       }
-
-      // Limit targetChar + trailingSpaceCount to the padded width of the cell
-      let cellWidth = 0;
-      for (let c = cell.column; c < cell.column + cell.colspan; c++) {
-        cellWidth += newVLines[c + 1] - newVLines[c] - 1;
-      }
-      cellWidth += cell.colspan - 1;
-      const maxTargetChar = Math.max(0, cellWidth - 1);
-      const finalTargetChar = Math.min(targetChar + trailingSpaceCount, maxTargetChar);
-
-      const newCursorLine = startLineIdx + fCellStartRow + targetLine;
-      const newCursorChar = newVLines[cell.column] + 2 + finalTargetChar;
-
-      isApplyingExtensionEdit = true;
-      const newPosition = new vscode.Position(newCursorLine, newCursorChar);
-      currentEditor.selection = new vscode.Selection(newPosition, newPosition);
-
-      // Bootstrap activeTable state with the newly formatted table
-      activeTable = {
-        tableNode,
-        startLineIdx,
-        endLineIdx: startLineIdx + (newRawLines.length - 1),
-        hLines: newHLines,
-        vLines: newVLines,
-        tableStr: formattedTable,
-        documentUri: document.uri,
-        documentVersion: document.version
-      };
-      isApplyingExtensionEdit = false;
     }
   }
 
@@ -1356,10 +1411,30 @@ export function activate(context: vscode.ExtensionContext) {
           if (match) {
             const { cell, startLineIdxInCell, endLineIdxInCell, startCharIdxInCell, endCharIdxInCell } = match;
 
-            const beforeText = cell.content[startLineIdxInCell] || '';
-            const afterText = cell.content[endLineIdxInCell] || '';
-            const before = beforeText.substring(0, startCharIdxInCell);
-            const after = afterText.substring(endCharIdxInCell);
+            let beforeText = cell.content[startLineIdxInCell] || '';
+            let afterText = cell.content[endLineIdxInCell] || '';
+            if (startCharIdxInCell > beforeText.length) {
+              beforeText = beforeText.padEnd(startCharIdxInCell, ' ');
+            }
+            let before = beforeText.substring(0, startCharIdxInCell);
+            let after = afterText.substring(endCharIdxInCell);
+
+            const relStartRow = change.range.start.line - activeTable.startLineIdx;
+            const relEndRow = change.range.end.line - activeTable.startLineIdx;
+            if (relStartRow >= 0 && relEndRow < prevTableLines.length) {
+              const startLineText = prevTableLines[relStartRow];
+              const leftSep = activeTable.vLines[cell.column];
+              const rightSep = activeTable.vLines[cell.column + cell.colspan];
+              if (leftSep !== -1 && rightSep !== -1) {
+                const rawSlice = startLineText.substring(leftSep + 1, rightSep);
+                if (/^\s*$/.test(rawSlice)) {
+                  const relCursor = change.range.start.character - (leftSep + 1);
+                  const actualCursor = rawSlice.startsWith(' ') ? relCursor - 1 : relCursor;
+                  before = " ".repeat(Math.max(0, actualCursor));
+                  after = " ".repeat(Math.max(0, rawSlice.length - 1 - relCursor));
+                }
+              }
+            }
 
             const insertedLines = change.text.split(/\r?\n/);
             const pastedInsertion: string[] = [];
@@ -1407,7 +1482,9 @@ export function activate(context: vscode.ExtensionContext) {
                 replacedLines.push(insertedLines[insertedLines.length - 1] + tAfter);
               }
               prevTableLines.splice(relStartLine, relEndLine - relStartLine + 1, ...replacedLines);
-              activeTable.tableStr = prevTableLines.join('\n');
+              const newTableStr = prevTableLines.join('\n');
+              activeTable.tableStr = newTableStr;
+              recalculateActiveTableGeometries(newTableStr);
             }
 
             const newLineIdx = startLineIdxInCell + (insertedLines.length - 1);
@@ -1445,9 +1522,11 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const change = event.contentChanges[0];
+    const isDeletion = change.text.length === 0 || (change.rangeLength > 0 && change.text.length < change.rangeLength);
 
     // 1. In-Memory Update Buffer Logic
     if (activeTable && activeTable.documentUri.fsPath === event.document.uri.fsPath) {
+      activeTable.isDeletion = isDeletion;
       if (change.range.start.line >= activeTable.startLineIdx && change.range.end.line <= activeTable.endLineIdx) {
         if (event.contentChanges.length === 1) {
           const prevTableLines = activeTable.tableStr.split('\n');
@@ -1463,12 +1542,44 @@ export function activate(context: vscode.ExtensionContext) {
           if (match) {
             const { cell, startLineIdxInCell, endLineIdxInCell, startCharIdxInCell, endCharIdxInCell } = match;
 
-            // Mutate in-memory cell content
-            const beforeText = cell.content[startLineIdxInCell] || '';
-            const afterText = cell.content[endLineIdxInCell] || '';
+            // REGLA: Escribir '-' o '|' tocando una línea de tabla es una intención de modificar el diseño,
+            // no de editar el contenido. Por lo tanto, no se debe redimensionar la celda ni añadir relleno.
+            const leftSep = activeTable.vLines[cell.column];
+            const rightSep = activeTable.vLines[cell.column + cell.colspan];
+            const isHyphenOrPipe = change.text === '-' || change.text === '|';
+            const isTouchingLeft = change.range.start.character === leftSep + 1;
+            const isTouchingRight = change.range.start.character === rightSep;
+            if (isHyphenOrPipe && (isTouchingLeft || isTouchingRight)) {
+              logToFile(`onDidChangeTextDocument: Layout modification intent detected (typed ${change.text} touching boundary). Not resizing or adding padding.`);
+              activeTable = undefined;
+              return;
+            }
 
-            const before = beforeText.substring(0, startCharIdxInCell);
-            const after = afterText.substring(endCharIdxInCell);
+            // Mutate in-memory cell content
+            let beforeText = cell.content[startLineIdxInCell] || '';
+            let afterText = cell.content[endLineIdxInCell] || '';
+            if (startCharIdxInCell > beforeText.length) {
+              beforeText = beforeText.padEnd(startCharIdxInCell, ' ');
+            }
+            let before = beforeText.substring(0, startCharIdxInCell);
+            let after = afterText.substring(endCharIdxInCell);
+
+            const relStartRow = change.range.start.line - activeTable.startLineIdx;
+            const relEndRow = change.range.end.line - activeTable.startLineIdx;
+            if (relStartRow >= 0 && relEndRow < prevTableLines.length) {
+              const startLineText = prevTableLines[relStartRow];
+              const leftSep = activeTable.vLines[cell.column];
+              const rightSep = activeTable.vLines[cell.column + cell.colspan];
+              if (leftSep !== -1 && rightSep !== -1) {
+                const rawSlice = startLineText.substring(leftSep + 1, rightSep);
+                if (/^\s*$/.test(rawSlice)) {
+                  const relCursor = change.range.start.character - (leftSep + 1);
+                  const actualCursor = rawSlice.startsWith(' ') ? relCursor - 1 : relCursor;
+                  before = " ".repeat(Math.max(0, actualCursor));
+                  after = " ".repeat(Math.max(0, rawSlice.length - 1 - relCursor));
+                }
+              }
+            }
 
             const insertedLines = change.text.split(/\r?\n/);
             const pastedInsertion: string[] = [];
@@ -1517,7 +1628,9 @@ export function activate(context: vscode.ExtensionContext) {
                 replacedLines.push(insertedLines[insertedLines.length - 1] + tAfter);
               }
               prevTableLines.splice(relStartLine, relEndLine - relStartLine + 1, ...replacedLines);
-              activeTable.tableStr = prevTableLines.join('\n');
+              const newTableStr = prevTableLines.join('\n');
+              activeTable.tableStr = newTableStr;
+              recalculateActiveTableGeometries(newTableStr);
             }
 
             // Record cursor coordinates in memory
@@ -1584,7 +1697,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         const tableStr = tableLines.join('\n');
         try {
-          const tableNode = parseGeometricTable(tableStr, false, true);
+          const tableNode = parseGeometricTable(tableStr, false, true, true);
           if (tableNode && tableNode.cells.length > 0) {
             const maxLength = Math.max(...tableLines.map(line => line.length));
             const grid = tableLines.map(line => line.padEnd(maxLength, ' '));
@@ -1667,7 +1780,7 @@ export function activate(context: vscode.ExtensionContext) {
       
       let tableNode;
       try {
-        tableNode = parseGeometricTable(tableStr, false, true);
+        tableNode = parseGeometricTable(tableStr, false, true, true);
       } catch (e: any) {
         logToFile(`Error parsing reconstructed table: ${e.message}`);
         return;
@@ -1970,7 +2083,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const tableStr = tableLines.join('\n');
       try {
-        const tableNode = parseGeometricTable(tableStr, false, true);
+        const tableNode = parseGeometricTable(tableStr, false, true, true);
         if (tableNode && tableNode.cells.length > 0) {
           const maxLength = Math.max(...tableLines.map(line => line.length));
           const grid = tableLines.map(line => line.padEnd(maxLength, ' '));
@@ -2138,14 +2251,60 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (cell) {
-        // Dismiss autocomplete - our memory-based editing is incompatible with
-        // VS Code's suggest widget, which would insert text directly into the
-        // document bypassing our cell content tracking.
-        vscode.commands.executeCommand('hideSuggestWidget');
+        // REGLA: Escribir '-' o '|' tocando una línea de tabla es una intención de modificar el diseño.
+        // Por lo tanto, no se debe considerar edición de contenido de la celda, no se debe redimensionar la celda ni añadir relleno.
+        const leftSep = activeTable.vLines[cell.column];
+        const rightSep = activeTable.vLines[cell.column + cell.colspan];
+        const isHyphenOrPipe = args.text === '-' || args.text === '|';
+        const editorCol = leftSep + 1 + charIdxInCell;
+        const isTouchingLeft = editorCol === leftSep + 1;
+        const isTouchingRight = editorCol === rightSep;
+        if (isHyphenOrPipe && (isTouchingLeft || isTouchingRight)) {
+          logToFile(`typeCommand: Layout modification intent detected. Bypassing activeTable mutation and replacing space.`);
+          activeTable = undefined; // Invalida activeTable para evitar auto-ajustes del editor
+
+          const pos = activeEditor.selection.active;
+          let rangeToReplace = new vscode.Range(pos, pos);
+
+          if (isTouchingLeft) {
+            const lineText = activeEditor.document.lineAt(pos.line).text;
+            if (lineText[pos.character] === ' ') {
+              rangeToReplace = new vscode.Range(pos, pos.translate(0, 1));
+            }
+          } else if (isTouchingRight) {
+            if (pos.character > 0) {
+              const lineText = activeEditor.document.lineAt(pos.line).text;
+              if (lineText[pos.character - 1] === ' ') {
+                rangeToReplace = new vscode.Range(pos.translate(0, -1), pos);
+              }
+            }
+          }
+
+          isApplyingExtensionEdit = true;
+          try {
+            const success = await activeEditor.edit(editBuilder => {
+              editBuilder.replace(rangeToReplace, args.text);
+            }, { undoStopBefore: false, undoStopAfter: false });
+
+            if (success) {
+              const targetChar = isTouchingLeft ? pos.character + 1 : pos.character;
+              const newPos = new vscode.Position(pos.line, targetChar);
+              activeEditor.selection = new vscode.Selection(newPos, newPos);
+            }
+          } finally {
+            isApplyingExtensionEdit = false;
+          }
+          return;
+        }
 
         // Apply the character to cell.content in memory (synchronous, O(1))
-        const lineText = cell.content[lineIdxInCell] || '';
+        let lineText = cell.content[lineIdxInCell] || '';
+        if (charIdxInCell > lineText.length) {
+          lineText = lineText.padEnd(charIdxInCell, ' ');
+        }
         cell.content[lineIdxInCell] = lineText.substring(0, charIdxInCell) + args.text + lineText.substring(charIdxInCell);
+
+        activeTable.isDeletion = false;
 
         // Record new cursor position in memory (synchronous)
         activeTable.targetCursor = {
@@ -2244,7 +2403,7 @@ export function activate(context: vscode.ExtensionContext) {
     const tableStr = tableLines.join('\n');
     let tableNode;
     try {
-      tableNode = parseGeometricTable(tableStr, false, true);
+      tableNode = parseGeometricTable(tableStr, false, true, true);
     } catch (e) {
       await vscode.commands.executeCommand('type', { text: '\n' });
       return;
@@ -2366,7 +2525,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Also add a new line to all other cells in the same row range (at the end of each cell's content)
     for (const otherCell of tableNode.cells) {
       if (otherCell.id !== cell.id) {
-        if (otherCell.row <= cell.row && cell.row < otherCell.row + otherCell.rowspan) {
+        if (otherCell.row <= j && j < otherCell.row + otherCell.rowspan) {
           otherCell.content.push('');
         }
       }
@@ -2430,11 +2589,36 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const newVLines = Array.from(newVLinesSet).sort((a, b) => a - b);
 
-      const newCursorLine = startLineIdx + newHLines[cell.row] + 1 + lineIdx + 1;
+      let contentRowsCount = 0;
+      let newCursorLineRel = newHLines[cell.row] + 1;
+      while (contentRowsCount < lineIdx + 2 && newCursorLineRel < newGrid.length) {
+        if (!newHLines.includes(newCursorLineRel)) {
+          contentRowsCount++;
+        }
+        if (contentRowsCount < lineIdx + 2) {
+          newCursorLineRel++;
+        }
+      }
+      const newCursorLine = startLineIdx + newCursorLineRel;
       const newCursorChar = newVLines[cell.column] + 2;
 
+      isApplyingExtensionEdit = true;
       const newPosition = new vscode.Position(newCursorLine, newCursorChar);
       activeEditor.selection = new vscode.Selection(newPosition, newPosition);
+
+      if (activeTable) {
+        activeTable.endLineIdx = activeTable.startLineIdx + (newRawLines.length - 1);
+        activeTable.hLines = newHLines;
+        activeTable.vLines = newVLines;
+        activeTable.tableStr = formattedTable;
+        activeTable.documentVersion = document.version;
+        activeTable.targetCursor = {
+          cellId: cell.id,
+          lineIdx: lineIdx + 1,
+          charIdx: 0
+        };
+      }
+      isApplyingExtensionEdit = false;
     }
   });
 

@@ -254,5 +254,59 @@ describe('Table Engine - Formatter', () => {
     const parsedPreserved = parseGeometricTable(tableStr, false, true);
     expect(parsedPreserved.cells[0].content).toEqual(['', '', '']);
   });
+
+  it('should handle and split non-rectangular cell groups to prevent cell overlaps', () => {
+    const tableStr = `
+|-----------------------------|
+| adf                         |
+| adfadfadfadfadfadfadfadfadf |
+|-----------------------------|
+|                                 |
+|                         ||      |
+|-----------|-----|---|---|       |
+|                         ||
+|                         ||
+|-----------|-----|---|---|       |
+`.trim();
+
+    const table = parseGeometricTable(tableStr, false, true);
+    const formatted = formatGeometricTable(table);
+    const lines = formatted.split('\n');
+    for (const line of lines) {
+      expect(line.startsWith('|')).toBe(true);
+      expect(line.endsWith('|')).toBe(true);
+      expect(line.includes('||')).toBe(false);
+    }
+  });
+
+  it('should auto-correct accidental pipe deletion in a content row', () => {
+    const tableStr = `
+|-----|------|
+| A   | B    |
+|-----|------|
+| C          |
+|-----|------|
+`.trim();
+
+    const table = parseGeometricTable(tableStr, false, false, true);
+    expect(table.rowsCount).toBe(2);
+    expect(table.colsCount).toBe(2);
+    expect(table.cells.length).toBe(4);
+
+    const cellC = table.cells.find(c => c.row === 1 && c.column === 0);
+    expect(cellC).toBeDefined();
+    expect(cellC?.content).toEqual(['C']);
+    expect(cellC?.colspan).toBe(1);
+
+    const formatted = formatGeometricTable(table);
+    const expected = `
+|---|---|
+| A | B |
+|---|---|
+| C |   |
+|---|---|
+`.trim();
+    expect(formatted).toBe(expected);
+  });
 });
 

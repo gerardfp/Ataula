@@ -4,11 +4,21 @@ Ataula is a VS Code extension I built with AI to make editing text tables easier
 
 You can create tables automatically, resize them, auto-fit them, edit the content inside the cells, select text inside a cell, select adjacent cells, and more features I’ll keep adding over time.
 
+Ah! And it allows converting to Markdown and from Markdown (within the limitations of Markdown tables).
+
 ![Ataula Usage](usage.gif)
 
 
+---
 
 (From this point on, everything is AI-generated.)
+
+> [!IMPORTANT]
+> **🤖 INSTRUCTIONS FOR AI CODING AGENTS (Copilot, Cursor, Gemini, Claude, GPT, Roo-Code, etc.):**
+> **CRITICAL CONSTRAINT / RESTRICCIÓN CRÍTICA:**
+> **JAMÁS** modifique los ficheros de datos de test (`test_cell_contents_editing`, `test_selection` y `test_table_autoadjust`) sin permiso explícito. 
+> Ningún modelo o agente de IA debe alterar o guardar cambios en esos tres ficheros de pruebas de datos. Si se detecta un fallo de lógica o definición en ellos, el agente debe explicar el error detalladamente al usuario para que sea corregido a mano o se reciban instrucciones específicas.
+
 
 **Ataula** is a powerful plain text geometric and ASCII table editing and formatting engine, designed specifically to provide first-class support for Markdown files, plain text documents, and the [**EduMark**](https://github.com/gerardfp/edumark) educational format.
 

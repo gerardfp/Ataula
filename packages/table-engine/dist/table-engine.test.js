@@ -212,5 +212,53 @@ const table_formatter_js_1 = require("./table-formatter.js");
         const parsedPreserved = (0, table_parser_js_1.parseGeometricTable)(tableStr, false, true);
         (0, vitest_1.expect)(parsedPreserved.cells[0].content).toEqual(['', '', '']);
     });
+    (0, vitest_1.it)('should handle and split non-rectangular cell groups to prevent cell overlaps', () => {
+        const tableStr = `
+|-----------------------------|
+| adf                         |
+| adfadfadfadfadfadfadfadfadf |
+|-----------------------------|
+|                                 |
+|                         ||      |
+|-----------|-----|---|---|       |
+|                         ||
+|                         ||
+|-----------|-----|---|---|       |
+`.trim();
+        const table = (0, table_parser_js_1.parseGeometricTable)(tableStr, false, true);
+        const formatted = (0, table_formatter_js_1.formatGeometricTable)(table);
+        const lines = formatted.split('\n');
+        for (const line of lines) {
+            (0, vitest_1.expect)(line.startsWith('|')).toBe(true);
+            (0, vitest_1.expect)(line.endsWith('|')).toBe(true);
+            (0, vitest_1.expect)(line.includes('||')).toBe(false);
+        }
+    });
+    (0, vitest_1.it)('should auto-correct accidental pipe deletion in a content row', () => {
+        const tableStr = `
+|-----|------|
+| A   | B    |
+|-----|------|
+| C          |
+|-----|------|
+`.trim();
+        const table = (0, table_parser_js_1.parseGeometricTable)(tableStr, false, false, true);
+        (0, vitest_1.expect)(table.rowsCount).toBe(2);
+        (0, vitest_1.expect)(table.colsCount).toBe(2);
+        (0, vitest_1.expect)(table.cells.length).toBe(4);
+        const cellC = table.cells.find(c => c.row === 1 && c.column === 0);
+        (0, vitest_1.expect)(cellC).toBeDefined();
+        (0, vitest_1.expect)(cellC?.content).toEqual(['C']);
+        (0, vitest_1.expect)(cellC?.colspan).toBe(1);
+        const formatted = (0, table_formatter_js_1.formatGeometricTable)(table);
+        const expected = `
+|---|---|
+| A | B |
+|---|---|
+| C |   |
+|---|---|
+`.trim();
+        (0, vitest_1.expect)(formatted).toBe(expected);
+    });
 });
 //# sourceMappingURL=table-engine.test.js.map

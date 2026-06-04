@@ -23,7 +23,7 @@ class DSU {
   }
 }
 
-export function parseGeometricTable(tableStr: string, isRubric = false, preserveEmptyLines = false): TableNode {
+export function parseGeometricTable(tableStr: string, isRubric = false, preserveEmptyLines = false, autoCorrectPipes = false): TableNode {
   // 1. Normalize lines and pad them to equal length
   const rawLines = tableStr.split(/\r?\n/).map(line => line.trimEnd());
   const lines = rawLines.filter(line => line.length > 0);
@@ -72,6 +72,73 @@ export function parseGeometricTable(tableStr: string, isRubric = false, preserve
 
   const H = hLines.length; // Number of horizontal border rows
   const V = vLines.length; // Number of vertical border columns
+
+  // 3b. Auto-correct accidental pipe deletions in content rows
+  if (autoCorrectPipes) {
+    for (let j = 0; j < H - 1; j++) {
+      const upperBorderRow = hLines[j];
+      const lowerBorderRow = hLines[j + 1];
+      const rStart = upperBorderRow + 1;
+      const rEnd = lowerBorderRow - 1;
+
+      for (let r = rStart; r <= rEnd; r++) {
+        let line = grid[r];
+        const lineVLines: number[] = [];
+        for (let c = 0; c < line.length; c++) {
+          if (line[c] === '|') {
+            lineVLines.push(c);
+          }
+        }
+
+        // Only auto-correct if the content row has fewer pipes than required
+        if (lineVLines.length < V) {
+          // Map every separator to its closest vLines index
+          const boundaryPos = Array(V).fill(-1);
+          for (const s of lineVLines) {
+            let closestIdx = 0;
+            let minDiff = Math.abs(s - vLines[0]);
+            for (let vIdx = 1; vIdx < V; vIdx++) {
+              const diff = Math.abs(s - vLines[vIdx]);
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = vIdx;
+              }
+            }
+            boundaryPos[closestIdx] = s;
+          }
+
+          let lineChanged = false;
+          for (let i = 0; i < V; i++) {
+            if (boundaryPos[i] === -1) {
+              const v = vLines[i];
+              
+              // Check if both upper and lower borders have '|' or '+' at index v
+              const upperHasSep = upperBorderRow < grid.length && v < grid[upperBorderRow].length && 
+                (grid[upperBorderRow][v] === '|' || grid[upperBorderRow][v] === '+');
+              const lowerHasSep = lowerBorderRow < grid.length && v < grid[lowerBorderRow].length && 
+                (grid[lowerBorderRow][v] === '|' || grid[lowerBorderRow][v] === '+');
+              
+              if (upperHasSep && lowerHasSep) {
+                if (v < line.length) {
+                  if (line[v] !== '|') {
+                    line = line.substring(0, v) + '|' + line.substring(v + 1);
+                    lineChanged = true;
+                  }
+                } else {
+                  line = line.padEnd(v, ' ') + '|';
+                  lineChanged = true;
+                }
+              }
+            }
+          }
+
+          if (lineChanged) {
+            grid[r] = line;
+          }
+        }
+      }
+    }
+  }
 
   const rowIntervalsCount = H - 1;
   const colIntervalsCount = V - 1;
@@ -244,7 +311,25 @@ export function parseGeometricTable(tableStr: string, isRubric = false, preserve
   const cells: TableCell[] = [];
   let cellCounter = 1;
 
+  const finalGroups: { j: number; i: number }[][] = [];
   for (const group of groups.values()) {
+    const minJ = Math.min(...group.map(g => g.j));
+    const maxJ = Math.max(...group.map(g => g.j));
+    const minI = Math.min(...group.map(g => g.i));
+    const maxI = Math.max(...group.map(g => g.i));
+    const rowspan = maxJ - minJ + 1;
+    const colspan = maxI - minI + 1;
+
+    if (group.length === rowspan * colspan) {
+      finalGroups.push(group);
+    } else {
+      for (const unit of group) {
+        finalGroups.push([unit]);
+      }
+    }
+  }
+
+  for (const group of finalGroups) {
     const minJ = Math.min(...group.map(g => g.j));
     const maxJ = Math.max(...group.map(g => g.j));
     const minI = Math.min(...group.map(g => g.i));

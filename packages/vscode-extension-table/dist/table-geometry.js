@@ -98,7 +98,7 @@ function getCellAtPosition(document, position) {
     const tableStr = tableLines.join('\n');
     let tableNode;
     try {
-        tableNode = (0, table_engine_1.parseGeometricTable)(tableStr, false, true);
+        tableNode = (0, table_engine_1.parseGeometricTable)(tableStr, false, true, true);
     }
     catch (e) {
         return undefined;
@@ -206,7 +206,7 @@ function getMinLeadingSpacesForCell(cell, startLineIdx, hLines, vLines, prevTabl
         }
     }
     if (minLeadingSpaces === Infinity) {
-        minLeadingSpaces = 0;
+        minLeadingSpaces = 1;
     }
     if (minLeadingSpaces > 1) {
         minLeadingSpaces = 1;
@@ -283,13 +283,33 @@ function getSingleCellForChange(tableNode, changeRange, startLineIdx, hLines, vL
     const cellStartRow = hLines[cell.row] + 1;
     const startLineIdxInCell = startR - cellStartRow;
     const endLineIdxInCell = endR - cellStartRow;
-    const minLeadingSpaces = getMinLeadingSpacesForCell(cell, startLineIdx, hLines, vLines, prevTableLines);
+    let minLeadingSpaces = getMinLeadingSpacesForCell(cell, startLineIdx, hLines, vLines, prevTableLines);
     const startColStart = startLeftSep + 1;
+    const startRow = cellStartRow + startLineIdxInCell;
+    const startLineTextVal = prevTableLines[startRow];
+    const startRawSlice = startLineTextVal.substring(startLeftSep + 1, startRightSep);
+    const isStartWhitespaceOnly = /^\s*$/.test(startRawSlice);
+    let startMinLeadingSpaces = minLeadingSpaces;
+    if (isStartWhitespaceOnly) {
+        startMinLeadingSpaces = 1;
+    }
     const cellContentAtLine = cell.content[startLineIdxInCell] || '';
-    const startCharIdxInCell = Math.max(0, Math.min(cellContentAtLine.length, startPos.character - (startColStart + minLeadingSpaces)));
+    const startCharIdxInCell = Math.max(0, isStartWhitespaceOnly
+        ? (startPos.character - (startColStart + startMinLeadingSpaces))
+        : Math.min(cellContentAtLine.length, startPos.character - (startColStart + startMinLeadingSpaces)));
     const endColStart = endLeftSep + 1;
+    const endRow = cellStartRow + endLineIdxInCell;
+    const endLineTextVal = prevTableLines[endRow];
+    const endRawSlice = endLineTextVal.substring(endLeftSep + 1, endRightSep);
+    const isEndWhitespaceOnly = /^\s*$/.test(endRawSlice);
+    let endMinLeadingSpaces = minLeadingSpaces;
+    if (isEndWhitespaceOnly) {
+        endMinLeadingSpaces = 1;
+    }
     const cellContentAtEndLine = cell.content[endLineIdxInCell] || '';
-    const endCharIdxInCell = Math.max(0, Math.min(cellContentAtEndLine.length, endPos.character - (endColStart + minLeadingSpaces)));
+    const endCharIdxInCell = Math.max(0, isEndWhitespaceOnly
+        ? (endPos.character - (endColStart + endMinLeadingSpaces))
+        : Math.min(cellContentAtEndLine.length, endPos.character - (endColStart + endMinLeadingSpaces)));
     return {
         cell,
         startLineIdxInCell,
